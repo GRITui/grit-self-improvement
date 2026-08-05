@@ -44,7 +44,7 @@ export default async function CheckinPage({
         />
       </div>
       <p className="fixed bottom-4 text-center text-xs text-ink-400">
-        Powered by GritDesk
+        Powered by FollowThru
       </p>
     </div>
   );
