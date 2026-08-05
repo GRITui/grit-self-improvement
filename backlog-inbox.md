@@ -191,6 +191,18 @@ Schema: see `PM_CHARTER.md` / `ai-engineering-loop` skill.
     client/token, not to a client login.
   </description>
   <researcher_notes></researcher_notes>
+  <engineer_notes>
+    PR opened: https://github.com/GRITui/grit-self-improvement/pull/4 (branch
+    squad/engineer-TSK-007-public-checkin). Build/lint clean. Resolved the UX-UI-Designer-Squad
+    cross-squad request on expired/invalid-token behavior: neutral "no longer active" message,
+    no self-service regeneration in this PR — flagged in the PR description as a default PM can
+    override rather than something I blocked on. clients gained cadence/questions (jsonb, capped
+    at 5, defaulted) since no backlog task owns a coach-facing editor for those yet; raised
+    TSK-016 for that gap. coaches gained full_name (best-effort from OAuth) since the check-in
+    page must lead with the coach's name per the wireframe. TSK-008 depends on this — do not pull
+    until this PR is merged to main. (Status intentionally left READY_FOR_PM, not
+    NEEDS_OWNER_REVIEW, per PM's note on TSK-006 — the open PR is the "awaiting review" signal.)
+  </engineer_notes>
 </task_item>
 
 <task_item>
@@ -306,6 +318,26 @@ Schema: see `PM_CHARTER.md` / `ai-engineering-loop` skill.
     written under the final name from the start. design/tokens.md and
     design/tailwind.config.snippet.js were deliberately built brand-agnostic (per TSK-003's
     designer_notes) and need no changes.
+  </description>
+  <researcher_notes></researcher_notes>
+</task_item>
+
+<task_item>
+  <id>TSK-016</id>
+  <source>ENGINEER_SQUAD</source>
+  <status>READY_FOR_PM</status>
+  <priority>MEDIUM</priority>
+  <title>Coach-facing UI to configure check-in cadence &amp; questions per client</title>
+  <description>
+    Raised during TSK-007. PROJECT_BRIEF.md §5 item 3 calls for "Program setup — cadence + up to
+    5 custom check-in questions per client/program template," but no backlog item ever built that
+    coach-facing configuration UI. TSK-007's public check-in page reads `clients.cadence` and
+    `clients.questions` (added in supabase/migrations/00000000000003_checkins.sql — jsonb array,
+    capped at 5, DB-level default of 3 generic questions/weekly cadence), but nothing lets a
+    coach change them from those defaults today. Build the edit UI (likely on the client detail
+    view, alongside TSK-006's roster) — add/remove/reorder up to 5 questions, set cadence. Not
+    blocking TSK-008/TSK-010, but needed before the product is usable with real, coach-specific
+    questions rather than the generic defaults.
   </description>
   <researcher_notes></researcher_notes>
 </task_item>

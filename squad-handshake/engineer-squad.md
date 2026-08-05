@@ -2,21 +2,18 @@
   <squad_name>Engineer-Squad</squad_name>
   <current_status>IDLE</current_status>
   <active_task_id></active_task_id>
-  <sprint_completion_percentage>25</sprint_completion_percentage>
+  <sprint_completion_percentage>33</sprint_completion_percentage>
 </squad_metadata>
 
 ## Current Focus
-TSK-005 and TSK-006 are both merged to `main`. TSK-007 (public client check-in flow) and
-TSK-010 (coach dashboard UI, also needs TSK-008) are now unblocked by TSK-006. TSK-009 (Stripe
-billing) has been unblocked since TSK-005 merged. Pull TSK-007 next per priority (MEDIUM vs.
-TSK-009's LOW) — note UX-UI-Designer-Squad left an open cross-squad request below about
-expired-token UX that TSK-007 should resolve before/while building.
+TSK-005 and TSK-006 are merged. TSK-007 (public client check-in flow) is built/tested and in
+PR #4 awaiting PM review. Per PM's guidance on TSK-001, next up is TSK-015 (rebrand app code/UI
+"GritDesk" -> "FollowThru") before TSK-011 (landing page) gets written under the old name.
+TSK-008 stays blocked until PR #4 merges; TSK-009 (Stripe billing, LOW priority) remains an
+unblocked fallback if TSK-015 turns out blocked for some reason.
 
-**Owner decision 2026-08-05: product renamed "GritDesk" → "FollowThru"** (TSK-001).
-PROJECT_BRIEF.md is updated; app code (package.json "name", page metadata, visible UI copy in
-TSK-005/006's output) still says "GritDesk" since it was built before this decision. TSK-015
-tracks the rename — do it before TSK-011 (landing page) so that page is written under the final
-name, but it can interleave after TSK-007 rather than jumping the queue.
+**Owner decision 2026-08-05: product renamed "GritDesk" -> "FollowThru"** (TSK-001). Not yet
+carried into app code — TSK-015 is next.
 
 ## Recent Commits / PRs
 * PR #2: https://github.com/GRITui/grit-self-improvement/pull/2 — TSK-005 scaffold Next.js +
@@ -26,19 +23,18 @@ name, but it can interleave after TSK-007 rather than jumping the queue.
   tokenized invite link, clients table + RLS migration, applied TSK-003 design tokens to new UI
   (ported to Tailwind v4 syntax). Status: **merged** (PM review 2026-08-05, squash commit
   9958bc8).
+* PR #4: https://github.com/GRITui/grit-self-improvement/pull/4 — TSK-007 public client check-in
+  flow: checkins table + SECURITY DEFINER functions for anonymous token-scoped access, cadence/
+  questions on clients, coaches.full_name for the check-in page header. Status: open, awaiting
+  PM review.
 
 ## Blockers & QA Failures
 (none yet)
 
 ## Cross-Squad Requests
-* **From UX-UI-Designer-Squad (relevant to TSK-007):** needs a product decision on
-  expired/invalid client check-in token behavior (error copy, whether an expired link can
-  regenerate) before the public check-in page is built — see
-  `design/wireframes/client-checkin.md` "Content & UX notes". Make the call as part of TSK-007
-  and log the decision here.
-* **Process note from PM:** TSK-005 and TSK-006 both came in tagged `NEEDS_OWNER_REVIEW` in
-  backlog-inbox.md while their PRs were open. That status is reserved for owner-level business
-  decisions (e.g. TSK-001's brand name), not "awaiting PM code review" — the open, unmerged PR
-  is itself the signal PM review is pending. Leave backlog status as-is (or `READY_FOR_PM` if
-  more of the same task's scope remains) while a PR is in review; PM will set it to `DONE` on
-  merge.
+* **From UX-UI-Designer-Squad, re: TSK-007 — resolved.** Expired/invalid check-in token behavior:
+  went with a neutral "no longer active" message, no self-service regeneration, documented as a
+  default in PR #4's description for PM to override if a different behavior is wanted.
+* Raised TSK-016 in backlog-inbox.md (coach-facing UI to configure check-in cadence/questions per
+  client) — gap discovered while building TSK-007; no existing task owned it. Not a blocker for
+  TSK-007, which ships with DB-level defaults.
