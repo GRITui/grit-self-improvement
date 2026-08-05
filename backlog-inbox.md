@@ -115,7 +115,7 @@ Schema: see `PM_CHARTER.md` / `ai-engineering-loop` skill.
 <task_item>
   <id>TSK-005</id>
   <source>OWNER_POPUP</source>
-  <status>NEEDS_OWNER_REVIEW</status>
+  <status>DONE</status>
   <priority>HIGH</priority>
   <title>Scaffold Next.js + Supabase + Tailwind project with coach auth</title>
   <description>
@@ -130,6 +130,13 @@ Schema: see `PM_CHARTER.md` / `ai-engineering-loop` skill.
     placeholder Supabase project. TSK-006/TSK-009 depend on this — do not pull until this PR is
     merged to main.
   </engineer_notes>
+  <pm_notes>
+    Reviewed and merged 2026-08-05 (PR #2, squash merge, commit 8b86130). Scoped correctly to
+    auth+scaffold only, RLS on `coaches` locks select/update to own row with no insert policy
+    (insert only via SECURITY DEFINER trigger — correct default-deny), secrets kept out of git,
+    password validated client+server. No CI configured on this repo yet (out of scope for this
+    task). TSK-006 and TSK-009 are now unblocked.
+  </pm_notes>
 </task_item>
 
 <task_item>
