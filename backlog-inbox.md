@@ -308,6 +308,16 @@ Schema: see `PM_CHARTER.md` / `ai-engineering-loop` skill.
     styling if those aren't done yet. Value prop, pricing table (section 4), signup CTA.
   </description>
   <researcher_notes></researcher_notes>
+  <engineer_notes>
+    PR opened: https://github.com/GRITui/grit-self-improvement/pull/9 (branch
+    squad/engineer-TSK-011-landing-page). Replaces the placeholder `/` page: hero, 3-step
+    how-it-works, feature highlights, and a pricing table that renders directly from
+    lib/billing.ts's PLAN_TIERS (no hardcoded prices to drift out of sync with TSK-009's Stripe
+    gating). Styled with the ink-*/brand-* design tokens (TSK-003) — /login and /signup still use
+    the older zinc/dark-mode scaffold styling, left untouched as out of scope. Build/lint clean;
+    no local Playwright browser available to screenshot, so verified via rendered HTML markup
+    instead.
+  </engineer_notes>
 </task_item>
 
 <task_item>

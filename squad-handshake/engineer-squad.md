@@ -1,18 +1,19 @@
 <squad_metadata>
   <squad_name>Engineer-Squad</squad_name>
-  <current_status>IN_PROGRESS</current_status>
-  <active_task_id>TSK-011</active_task_id>
-  <sprint_completion_percentage>88</sprint_completion_percentage>
+  <current_status>IDLE</current_status>
+  <active_task_id></active_task_id>
+  <sprint_completion_percentage>94</sprint_completion_percentage>
 </squad_metadata>
 
 ## Current Focus
-TSK-005, TSK-006, TSK-007, TSK-015, and TSK-009 are merged to `main`. TSK-008 (AI check-in
-summarization/risk/draft-reply, PR #7) and TSK-016 (coach-facing cadence/questions editor, PR #8)
-are both built and open, awaiting PM review. TSK-017 was folded into PR #7 as a second commit
-(same-directory fix, PR hadn't merged). TSK-010 (dashboard UI) stays blocked until PR #7 merges.
+TSK-005, TSK-006, TSK-007, TSK-015, and TSK-009 are merged to `main`. Three PRs are now open
+awaiting PM review: TSK-008 (AI check-in summarization/risk/draft-reply, PR #7, includes TSK-017's
+footer fix), TSK-016 (coach-facing cadence/questions editor, PR #8), and TSK-011 (marketing
+landing page, PR #9). Every remaining Engineer-Squad-buildable item is now either in one of these
+PRs or blocked on one merging: TSK-010 (dashboard UI) needs TSK-008/PR #7 merged first. TSK-012/
+013/014 are QA-Squad tasks. TSK-018 is an owner tracking checklist, not directly buildable.
 
-Now picking up TSK-011 (marketing landing page) next — unblocked since the rebrand (TSK-015) is
-on `main`.
+Going idle until a PR merges. Will pick up TSK-010 as soon as PR #7 lands.
 
 **Owner decision 2026-08-05: product renamed "GritDesk" -> "FollowThru"** (TSK-001) — carried
 into app code via TSK-015/PR #5, merged.
@@ -32,6 +33,9 @@ forward.
 * PR #8: https://github.com/GRITui/grit-self-improvement/pull/8 — TSK-016 coach-facing check-in
   cadence & questions editor on /dashboard/clients (add/remove/reorder up to 5 questions, cadence
   select). No migration — reuses TSK-007's clients.cadence/questions columns. Status: **open**.
+* PR #9: https://github.com/GRITui/grit-self-improvement/pull/9 — TSK-011 marketing landing page:
+  hero, how-it-works, feature highlights, pricing table sourced from lib/billing.ts's PLAN_TIERS.
+  Status: **open**.
 * PR #2: https://github.com/GRITui/grit-self-improvement/pull/2 — TSK-005 scaffold Next.js +
   Supabase + Tailwind with coach auth (email/password + Google OAuth), coaches table + RLS
   migration. Status: **merged** (PM review 2026-08-05, squash commit 8b86130).
