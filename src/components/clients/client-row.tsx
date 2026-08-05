@@ -6,6 +6,7 @@ import {
   updateClient,
   type ClientFormState,
 } from "@/app/dashboard/clients/actions";
+import { ProgramEditor } from "@/components/clients/program-editor";
 import type { Client } from "@/lib/types";
 
 const initialState: ClientFormState = {};
@@ -18,6 +19,7 @@ export function ClientRow({
   checkinBaseUrl: string;
 }) {
   const [editing, setEditing] = useState(false);
+  const [configuringProgram, setConfiguringProgram] = useState(false);
   const [confirmingRemove, setConfirmingRemove] = useState(false);
   const [copied, setCopied] = useState(false);
   const [state, formAction, pending] = useActionState(
@@ -26,6 +28,15 @@ export function ClientRow({
   );
 
   const inviteLink = `${checkinBaseUrl}/checkin/${client.invite_token}`;
+
+  if (configuringProgram) {
+    return (
+      <ProgramEditor
+        client={client}
+        onDone={() => setConfiguringProgram(false)}
+      />
+    );
+  }
 
   async function copyInviteLink() {
     await navigator.clipboard.writeText(inviteLink);
@@ -121,6 +132,13 @@ export function ClientRow({
           className="rounded-md border border-ink-200 px-3 py-2 text-sm font-medium text-ink-700 hover:bg-ink-50"
         >
           Edit
+        </button>
+        <button
+          type="button"
+          onClick={() => setConfiguringProgram(true)}
+          className="rounded-md border border-ink-200 px-3 py-2 text-sm font-medium text-ink-700 hover:bg-ink-50"
+        >
+          Check-in program
         </button>
         {confirmingRemove ? (
           <form action={removeClient}>
