@@ -80,7 +80,7 @@ Schema: see `PM_CHARTER.md` / `ai-engineering-loop` skill.
 <task_item>
   <id>TSK-004</id>
   <source>OWNER_POPUP</source>
-  <status>READY_FOR_PM</status>
+  <status>DONE</status>
   <priority>HIGH</priority>
   <title>Wireframes: landing page, coach dashboard, client check-in form</title>
   <description>
@@ -90,6 +90,16 @@ Schema: see `PM_CHARTER.md` / `ai-engineering-loop` skill.
     loosely on TSK-003 tokens but do not block — placeholder styling is fine.
   </description>
   <researcher_notes></researcher_notes>
+  <designer_notes>
+    Delivered ASCII-diagram wireframes (desktop + mobile) as
+    `design/wireframes/{landing-page,coach-dashboard,client-checkin}.md`, plus an index README.
+    Dashboard sorts clients by risk (High->Low) by default rather than alphabetically. Client
+    check-in page is coach-branded, not product-branded, with no login/account UI anywhere,
+    matching PROJECT_BRIEF.md §2's zero-friction constraint. Raised one cross-squad request
+    (expired-token UX decision for TSK-007) in this file's Cross-Squad Requests section — not a
+    blocker for this task. No further READY_FOR_PM items tagged for UX-UI-Designer-Squad as of
+    this cycle; squad going IDLE.
+  </designer_notes>
 </task_item>
 
 <task_item>
