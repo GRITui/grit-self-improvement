@@ -99,6 +99,47 @@ export async function updateClient(
   return {};
 }
 
+const CADENCE_OPTIONS = ["weekly", "biweekly", "monthly"] as const;
+
+export async function updateProgram(
+  _prevState: ClientFormState,
+  formData: FormData
+): Promise<ClientFormState> {
+  const id = String(formData.get("id") ?? "");
+  const cadence = String(formData.get("cadence") ?? "");
+  const questions = (
+    JSON.parse(String(formData.get("questions") ?? "[]")) as string[]
+  )
+    .map((question) => question.trim())
+    .filter(Boolean);
+
+  if (!id) {
+    return { error: "Missing client." };
+  }
+
+  if (!CADENCE_OPTIONS.includes(cadence as (typeof CADENCE_OPTIONS)[number])) {
+    return { error: "Invalid cadence." };
+  }
+
+  if (questions.length < 1 || questions.length > 5) {
+    return { error: "Choose between 1 and 5 questions." };
+  }
+
+  const { supabase } = await requireCoachId();
+
+  const { error } = await supabase
+    .from("clients")
+    .update({ cadence, questions })
+    .eq("id", id);
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  revalidatePath("/dashboard/clients");
+  return {};
+}
+
 export async function removeClient(formData: FormData) {
   const id = String(formData.get("id") ?? "");
   if (!id) return;
