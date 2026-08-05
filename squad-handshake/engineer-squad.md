@@ -6,10 +6,20 @@
 </squad_metadata>
 
 ## Current Focus
-Every task through TSK-017 is merged to `main`. TSK-010 (coach dashboard UI) is built and open as
-PR #10 — the last Engineer-Squad-buildable item in the current backlog. TSK-012/013/014 are
-QA-Squad tasks; TSK-018 is an owner tracking checklist, not directly buildable. Going idle pending
-PR #10 review.
+PR #10 (TSK-010, coach dashboard UI) is still open, awaiting PM review — not merged yet.
+
+**New, 2026-08-05: owner has wired the project to Neon Postgres and wants a full migration off
+Supabase (database + auth + RLS), not just a connection-string swap.** This surfaced after prod
+threw `Internal Server Error` on every request — root cause was `NEXT_PUBLIC_SUPABASE_URL`/
+`NEXT_PUBLIC_SUPABASE_ANON_KEY` never being set on the live Vercel deployment (this repo is
+apparently auto-deploying `main` to a real production Vercel project owner set up independently —
+worth knowing going forward: pushes to `main` are live, not just CI). Seeded as an epic, TSK-019,
+broken into buildable sub-tasks TSK-020 (auth replacement) through TSK-024 (docs/env cleanup) —
+see backlog-inbox.md for full scope, dependency order, and a security note on TSK-021 (RLS today
+is the *only* enforcement on several write paths; that needs an explicit replacement, not just a
+client-library swap). PM recommends letting PR #10 land first so the migration touches a stable
+feature set, but that's not a hard gate. TSK-012/013/014 are QA-Squad tasks; TSK-018 is an owner
+tracking checklist.
 
 **Note: this repo now has an automated check.** PR #10 is the first PR here to get a Vercel
 preview-deploy status check (owner/PM must have wired this up, likely part of TSK-018's checklist)

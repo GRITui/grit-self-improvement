@@ -577,3 +577,148 @@ Schema: see `PM_CHARTER.md` / `ai-engineering-loop` skill.
   </description>
   <researcher_notes></researcher_notes>
 </task_item>
+
+<task_item>
+  <id>TSK-019</id>
+  <source>OWNER_POPUP</source>
+  <status>READY_FOR_PM</status>
+  <priority>HIGH</priority>
+  <title>[EPIC] Migrate off Supabase to Neon — database + auth</title>
+  <description>
+    Owner has wired the project to a Neon Postgres database (2026-08-05) and wants a full
+    migration off Supabase, not just a connection-string swap. Root cause for this: TSK-005's
+    scaffold used Supabase for three separable things — Postgres hosting, Auth (email/password +
+    Google OAuth via @supabase/ssr), and Row Level Security policies keyed off Supabase's
+    `auth.uid()` session variable. All three need a replacement, and RLS in particular is not just
+    plumbing: several existing write paths (e.g. `updateClient`/`removeClient`/`updateProgram` in
+    src/app/dashboard/clients/actions.ts) rely on RLS as the *only* enforcement — they don't
+    explicitly filter by `coach_id` in the query. Losing that safety net during migration without
+    replacing it is a real authorization-bypass risk, not a nice-to-have.
+
+    This is tracked as an epic — TSK-020 through TSK-024 below are the actual buildable units.
+    Do not pick up this item directly; pick up its sub-tasks. PM will update this item's status
+    as sub-tasks complete and will re-triage if a sub-task reveals the scope needs to change.
+
+    Sequencing recommendation: let PR #10 (TSK-010, currently open) land first so the migration
+    touches a complete, stable feature set once rather than rebasing mid-flight — but this is a
+    call for whoever's picking up TSK-020, not a hard gate.
+
+    PM's default technical recommendation (stated so Engineer-Squad isn't starting from zero, not
+    as a mandate — override if a sub-task turns up a real blocker): **Neon Auth** for the auth
+    replacement, since it's Neon's own first-party auth product and the natural pairing given the
+    owner already chose Neon; **Drizzle ORM** for the data layer, since it's the most common Neon
+    pairing and gives type safety without hand-rolled SQL string building. Either can be swapped
+    for Auth.js/Clerk or raw `pg`/`postgres.js` if a sub-task's owner has a strong reason.
+  </description>
+  <researcher_notes></researcher_notes>
+</task_item>
+
+<task_item>
+  <id>TSK-020</id>
+  <source>OWNER_POPUP</source>
+  <status>READY_FOR_PM</status>
+  <priority>HIGH</priority>
+  <title>Replace Supabase Auth with Neon-compatible auth (coach signup/login/OAuth + sessions)</title>
+  <description>
+    Part of the TSK-019 epic. Replace Supabase Auth (email/password + Google OAuth,
+    @supabase/ssr session cookies, src/proxy.ts middleware) with a Neon-compatible auth solution
+    — Neon Auth is the PM's default recommendation (see TSK-019), but pick what actually fits once
+    you're in the code. Must preserve: email/password signup+login, "Continue with Google" OAuth,
+    session-protected `/dashboard/*` routes (currently enforced in src/lib/supabase/middleware.ts),
+    and a stable per-coach user ID that TSK-021's data-layer migration can key all tables off of
+    (mirrors today's `coaches.id` referencing `auth.users(id)`). Update `supabase/README.md`
+    (rename/rewrite as the new auth+DB setup doc) and `.env.example` to match. This unblocks
+    TSK-021.
+  </description>
+  <researcher_notes></researcher_notes>
+</task_item>
+
+<task_item>
+  <id>TSK-021</id>
+  <source>OWNER_POPUP</source>
+  <status>READY_FOR_PM</status>
+  <priority>HIGH</priority>
+  <title>Migrate Postgres data layer from Supabase client to Neon, replacing RLS with explicit app-layer authorization</title>
+  <description>
+    Part of the TSK-019 epic. Depends on TSK-020 (needs the new auth's user-ID shape). Replace
+    `@supabase/supabase-js`/`@supabase/ssr` table access (coaches, clients, checkins) with a Neon
+    client — Drizzle ORM is the PM's default recommendation (see TSK-019). Run the existing
+    `supabase/migrations/*.sql` against Neon (they're portable Postgres, but strip/adapt anything
+    Supabase-specific: `auth.users` foreign key references and the `handle_new_coach` trigger on
+    Supabase's auth schema need to key off whatever TSK-020's auth solution provides instead).
+
+    **Security-critical part, read carefully:** today, RLS policies are the *only* thing stopping
+    a coach from reading/writing another coach's rows on several paths — e.g.
+    `updateClient`/`removeClient`/`updateProgram` in src/app/dashboard/clients/actions.ts call
+    `.update()`/`.eq("id", id)` with no `coach_id` filter, relying entirely on RLS's `USING
+    (auth.uid() = coach_id)` clause. Neon supports Postgres RLS too, so you *can* keep an
+    RLS-based model if the chosen client/ORM can set a per-request session variable equivalent to
+    `auth.uid()` — but if the migration instead moves authorization into the application layer,
+    every one of those call sites needs an explicit `WHERE coach_id = <session coach id>` added,
+    not just a client-library swap. Audit every existing query against `coaches`/`clients`/
+    `checkins` for this before calling this task done — grep for `.update(`, `.delete(`, `.select(`
+    across `src/app/dashboard/` and `src/lib/`.
+  </description>
+  <researcher_notes></researcher_notes>
+</task_item>
+
+<task_item>
+  <id>TSK-022</id>
+  <source>OWNER_POPUP</source>
+  <status>READY_FOR_PM</status>
+  <priority>MEDIUM</priority>
+  <title>Re-implement anonymous public check-in flow against Neon (no direct table access without a valid token)</title>
+  <description>
+    Part of the TSK-019 epic. Depends on TSK-021. TSK-007's public check-in flow
+    (src/app/checkin/[token]/) currently works via two Postgres `SECURITY DEFINER` functions
+    called through Supabase's `.rpc()` — `get_client_by_invite_token` and `submit_checkin` — which
+    let an anonymous visitor act on exactly the one client whose 128-bit invite token they hold,
+    with no ability to enumerate or browse anything else. Neon is plain Postgres, so
+    `SECURITY DEFINER` functions still work there and calling them via raw SQL through the chosen
+    client/ORM is the most direct port. If instead this gets reimplemented as application-code
+    token lookup + insert (no DB function), the same guarantee — a caller with an invalid or
+    someone-else's token cannot read or write any other client/checkin row — must be preserved
+    explicitly in that code, not assumed. Depends on TSK-021 for `checkins`/`clients` being live on
+    Neon first.
+  </description>
+  <researcher_notes></researcher_notes>
+</task_item>
+
+<task_item>
+  <id>TSK-023</id>
+  <source>OWNER_POPUP</source>
+  <status>READY_FOR_PM</status>
+  <priority>MEDIUM</priority>
+  <title>Re-implement service-role/admin write path for AI analysis + Stripe webhook against Neon</title>
+  <description>
+    Part of the TSK-019 epic. Depends on TSK-021. TSK-008's AI check-in analysis (writes
+    ai_summary/risk_level/draft_reply after the fact, no coach session to authenticate as) and
+    TSK-009's Stripe webhook handler (writes coaches.plan by stripe_customer_id, same situation)
+    both currently use a Supabase service-role client (src/lib/supabase/admin.ts) that bypasses
+    RLS entirely. Under Neon there's no separate "service role" concept — this maps to a direct
+    Postgres connection with full write privileges. The security-relevant part: make sure that
+    privileged connection/credential is only ever used server-side in these two specific paths
+    (webhook handler, post-check-in analysis), never exposed to anything a browser or the
+    anonymous check-in submitter can reach — same boundary that exists today, just implemented
+    differently.
+  </description>
+  <researcher_notes></researcher_notes>
+</task_item>
+
+<task_item>
+  <id>TSK-024</id>
+  <source>OWNER_POPUP</source>
+  <status>READY_FOR_PM</status>
+  <priority>LOW</priority>
+  <title>Update docs/env vars for Neon migration; remove dead Supabase references</title>
+  <description>
+    Part of the TSK-019 epic. Depends on TSK-020/021/022/023 being done (or far enough along that
+    the final shape is known). Rewrite `supabase/README.md` (or replace with a new
+    `neon/README.md`) to document the actual Neon + chosen-auth-provider setup steps in place of
+    the current Supabase project setup instructions. Update `.env.example` to drop
+    `NEXT_PUBLIC_SUPABASE_*`/`SUPABASE_SERVICE_ROLE_KEY` and add whatever Neon/auth-provider env
+    vars the migration ended up needing. Sweep for any other stray Supabase references (comments,
+    PROJECT_BRIEF.md §6 tech stack list, README.md) and update them to match reality.
+  </description>
+  <researcher_notes></researcher_notes>
+</task_item>
