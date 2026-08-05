@@ -142,7 +142,7 @@ Schema: see `PM_CHARTER.md` / `ai-engineering-loop` skill.
 <task_item>
   <id>TSK-006</id>
   <source>OWNER_POPUP</source>
-  <status>READY_FOR_PM</status>
+  <status>NEEDS_OWNER_REVIEW</status>
   <priority>MEDIUM</priority>
   <title>Client roster CRUD + tokenized invite link</title>
   <description>
@@ -151,6 +151,15 @@ Schema: see `PM_CHARTER.md` / `ai-engineering-loop` skill.
     scoped to the owning coach.
   </description>
   <researcher_notes></researcher_notes>
+  <engineer_notes>
+    PR opened: https://github.com/GRITui/grit-self-improvement/pull/3 (branch
+    squad/engineer-TSK-006-client-roster). Build/lint clean. "Remove" implemented as soft-delete
+    (archived_at) to avoid orphaning future check-in history (TSK-007/TSK-008). Also applied
+    TSK-003's design tokens to the new UI (ported to Tailwind v4 CSS @theme syntax since the
+    design squad's snippet targeted v3's tailwind.config.js) — TSK-005's auth pages still use the
+    original zinc palette, flagged as a follow-up, not blocking. TSK-007 depends on this — do not
+    pull until this PR is merged to main.
+  </engineer_notes>
 </task_item>
 
 <task_item>
