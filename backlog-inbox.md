@@ -42,7 +42,7 @@ Schema: see `PM_CHARTER.md` / `ai-engineering-loop` skill.
 <task_item>
   <id>TSK-002</id>
   <source>OWNER_POPUP</source>
-  <status>READY_FOR_PM</status>
+  <status>DONE</status>
   <priority>MEDIUM</priority>
   <title>Draft lightweight GTM plan for post-MVP launch</title>
   <description>
@@ -50,7 +50,17 @@ Schema: see `PM_CHARTER.md` / `ai-engineering-loop` skill.
     (target communities, launch channels, positioning angle) as a new section appended to
     PROJECT_BRIEF.md. Keep it to one page — this is not a full marketing plan.
   </description>
-  <researcher_notes></researcher_notes>
+  <researcher_notes>
+    Completed 2026-08-05 via desk research (Reddit self-promo norms, IndieHackers launch patterns,
+    coaching Facebook-group landscape, ICF chapter newsletter sponsorships, AppSumo LTD tradeoffs).
+    Appended Section 9 to PROJECT_BRIEF.md: positioning angle (lead with the demonstrable AI
+    risk-flag wedge, not "another coaching CRM"), 5 ranked low/no-budget channels (Reddit,
+    IndieHackers, coaching Facebook groups w/ a lead-magnet tie-in to TSK-001's disengagement-
+    signal findings, ICF chapter newsletters, Product Hunt), a first-10-customers white-glove
+    tactic, and a note on why AppSumo/LTD listings are deliberately deferred post-launch rather
+    than used as a launch-day channel (revenue share + refund-heavy buyer base misaligned with
+    recurring B2B pricing pre-PMF). Kept to one section, no PROJECT_BRIEF.md rewrite.
+  </researcher_notes>
 </task_item>
 
 <task_item>

@@ -5,6 +5,7 @@ deepen/challenge this, not treat it as fixed truth.
 
 Revision log: 2026-08-05 — Researcher-Squad (TSK-001) added market/ICP validation notes to
 Sections 1 and 3, and resolved the brand-name risk in Section 8 with 3 researched alternatives.
+2026-08-05 — Researcher-Squad (TSK-002) appended Section 9, a lightweight GTM plan.
 
 ## 1. Problem & Opportunity
 
@@ -159,3 +160,43 @@ Repo layout: scaffold the Next.js app at the repo root using standard App Router
 - AI summarization quality/liability: coach must review before sending, never auto-send.
 - Cold-start distribution: no existing audience. Early GTM likely coaching Facebook
   groups/subreddits/IndieHackers — Researcher-Squad to scope a lightweight GTM plan post-MVP.
+  See Section 9 for the resulting plan.
+
+## 9. GTM Plan — First 10 Paying Coaches (TSK-002, Researcher-Squad, 2026-08-05)
+
+Low/no-budget plan for post-MVP launch. Beachhead: independent life/business/fitness coaches
+running 10-50 clients on structured accountability programs, currently on spreadsheets/Google
+Forms/Notion (same ICP as Section 3) — not coaches in general.
+
+**Positioning angle:** lead with the AI triage wedge, not "another coaching CRM." Headline framing:
+*"Stop losing clients you didn't know had gone quiet"* — the risk-flag feature is the hook because
+it's demonstrable (show a real flagged check-in), not just described, and no found competitor
+offers it (Section 1).
+
+**Channels, roughly in order of effort/payoff for a cold start:**
+1. **Reddit (r/coaching, r/lifecoach)** — participate genuinely first (90/10 rule: ~90% real
+   engagement, ≤10% mentions of the product); "build in public" posts and comments on existing
+   check-in/admin-burden threads outperform direct pitches and avoid mod removal/bans.
+2. **IndieHackers** — build-in-public log + a launch post once there's a working MVP; this
+   audience responds well to "I built X because Y" narratives and gives early feedback before a
+   wider push.
+3. **Coaching Facebook groups** — dozens of active groups (e.g. The Good Alliance and others);
+   lead with a free lead magnet tied to this research — a short "10 early warning signs a client
+   is about to drop out" checklist (content already substantiated by TSK-001's disengagement-
+   signal research) — before any product mention.
+4. **ICF local chapter newsletters** — 140+ chapters, most run monthly newsletters open to
+   free or low-cost sponsor/content placement; the most targeted channel found for credentialed,
+   paying-capacity coaches specifically, worth testing 2-3 chapters before scaling spend.
+5. **Product Hunt launch** — standard visibility/backlink play once MVP is ready; treat as a
+   traffic/credibility spike, not the primary acquisition channel.
+
+**First-10 tactic:** personally offer free white-glove onboarding (coach keeps using it free
+through their first full check-in cycle) in exchange for a testimonial/case study, sourced from
+the communities above. The product's edge is best proven by a real flagged check-in, not a demo
+video, so getting a handful of real client cohorts running matters more than volume of signups
+early on.
+
+**Considered and deliberately deferred:** AppSumo/lifetime-deal listings — real distribution reach
+(can drive rapid signups), but ~60% revenue share plus a deal-seeking, refund-heavy buyer base
+(platform average ~17% refund rate) is a poor fit for a recurring $29-99/mo B2B product before
+organic retention data exists. Revisit only after the core channels above show product-market fit.
