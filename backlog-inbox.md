@@ -38,7 +38,7 @@ Schema: see `PM_CHARTER.md` / `ai-engineering-loop` skill.
 <task_item>
   <id>TSK-003</id>
   <source>OWNER_POPUP</source>
-  <status>READY_FOR_PM</status>
+  <status>DONE</status>
   <priority>HIGH</priority>
   <title>Design tokens & style guide</title>
   <description>
@@ -49,6 +49,14 @@ Schema: see `PM_CHARTER.md` / `ai-engineering-loop` skill.
     Tailwind config snippet Engineer-Squad can drop in directly.
   </description>
   <researcher_notes></researcher_notes>
+  <designer_notes>
+    Delivered `design/tokens.md` (color palette incl. reserved risk-flag semantic colors,
+    typography scale, spacing, radius/elevation, component tone, a11y notes) and
+    `design/tailwind.config.snippet.js` (ready-to-merge Tailwind v3 theme.extend block). Neutral
+    "ink" + single "brand" teal accent chosen deliberately over consumer-app-style saturated
+    palettes; color/token names are brand-agnostic so a TSK-001 rename won't require restructuring.
+    Engineer-Squad: merge the snippet into tailwind.config.js during TSK-005 scaffolding.
+  </designer_notes>
 </task_item>
 
 <task_item>
