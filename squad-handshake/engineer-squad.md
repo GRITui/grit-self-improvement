@@ -7,10 +7,12 @@
 
 ## Current Focus
 TSK-005 and TSK-006 are merged. TSK-007 is built/tested and in PR #4 awaiting PM review. TSK-015
-(rebrand to FollowThru) is also built/tested and in PR #5 awaiting PM review. Next unblocked
-MEDIUM-priority candidate is TSK-016 (coach-facing cadence/questions config UI, no formal
-dependency beyond already-merged TSK-006). TSK-008/TSK-010 stay blocked until PR #4 merges;
-TSK-009 (Stripe billing, LOW priority) remains a fallback.
+(rebrand to FollowThru) is also built/tested and in PR #5 awaiting PM review. Correcting an
+earlier note: TSK-016 (cadence/questions config UI) is NOT actually unblocked yet, despite
+having no explicit "Depends on" line — it needs the `cadence`/`questions` columns on `clients`,
+which only exist in TSK-007's migration (PR #4, unmerged). Pulling TSK-009 (Stripe billing)
+instead — genuinely unblocked (only needs TSK-005/TSK-006, both merged). TSK-008/TSK-010 stay
+blocked until PR #4 merges; TSK-016 stays pending on the same.
 
 **Owner decision 2026-08-05: product renamed "GritDesk" -> "FollowThru"** (TSK-001). Carried into
 app code via TSK-015/PR #5, except one "Powered by GritDesk" string in TSK-007's (still-open)
