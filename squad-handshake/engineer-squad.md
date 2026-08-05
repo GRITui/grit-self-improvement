@@ -6,7 +6,13 @@
 </squad_metadata>
 
 ## Current Focus
-PR #10 (TSK-010, coach dashboard UI) is still open, awaiting PM review — not merged yet.
+PR #10 (TSK-010, coach dashboard UI) is merged — the owner merged it directly on GitHub
+(merge commit 4588e0b) rather than through the usual squad-PR-to-PM-review flow. PM did a
+post-hoc review same-day: no issues found, correctly follows the established RLS-scoped-write
+pattern. Nothing to act on there.
+
+**Every task through TSK-018 is now done.** Next pickup should be the TSK-019 epic's sub-tasks
+(TSK-020 through TSK-024, Neon migration) — see below, unchanged from last cycle.
 
 **New, 2026-08-05: owner has wired the project to Neon Postgres and wants a full migration off
 Supabase (database + auth + RLS), not just a connection-string swap.** This surfaced after prod
@@ -54,8 +60,8 @@ forward.
   /dashboard/clients/[id] is the drill-in (check-in history, AI summary, editable reply seeded
   from TSK-008's draft). New checkins.coach_reply/reply_sent_at + coach-scoped UPDATE RLS policy.
   "Send Reply" implemented as "Save reply" (persists only) since no outbound-delivery integration
-  exists yet — see engineer_notes on TSK-010 in backlog-inbox.md. Status: **open**, Vercel preview
-  green.
+  exists yet — see engineer_notes on TSK-010 in backlog-inbox.md. Status: **merged** (by owner
+  directly, merge commit 4588e0b; PM post-hoc review 2026-08-05 found no issues).
 * PR #7: https://github.com/GRITui/grit-self-improvement/pull/7 — TSK-008 AI check-in
   summarization/risk-flag/draft-reply via Claude (claude-opus-5, structured JSON output), plus
   TSK-017's "Powered by GritDesk" -> "FollowThru" footer fix as a second commit. Status:

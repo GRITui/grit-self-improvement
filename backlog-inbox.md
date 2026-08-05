@@ -313,7 +313,7 @@ Schema: see `PM_CHARTER.md` / `ai-engineering-loop` skill.
 <task_item>
   <id>TSK-010</id>
   <source>OWNER_POPUP</source>
-  <status>READY_FOR_PM</status>
+  <status>DONE</status>
   <priority>MEDIUM</priority>
   <title>Coach dashboard UI</title>
   <description>
@@ -338,6 +338,16 @@ Schema: see `PM_CHARTER.md` / `ai-engineering-loop` skill.
     First PR in this repo to get an automated check: Vercel preview deploy went green
     (owner/PM must have wired up Vercel per TSK-018's checklist). Build/lint also clean locally.
   </engineer_notes>
+  <pm_notes>
+    Merged by the owner directly on GitHub (merge commit 4588e0b), outside the normal
+    squad-PR-to-PM-review flow — PM did a post-hoc review 2026-08-05 rather than a pre-merge one.
+    Client detail page and the new coach-reply UPDATE correctly rely on RLS scoped to
+    `coach_id = auth.uid()` (via the `clients` join for the new policy), consistent with the
+    established pattern elsewhere in this codebase — a coach requesting another coach's client id
+    404s rather than leaking data, matching the PR's own test claim. The "Send Reply" -> "Save
+    reply" scope narrowing is a reasonable, transparently-documented call; no code changes needed.
+    No blocking issues found.
+  </pm_notes>
 </task_item>
 
 <task_item>
