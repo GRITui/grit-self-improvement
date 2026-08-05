@@ -247,6 +247,20 @@ Schema: see `PM_CHARTER.md` / `ai-engineering-loop` skill.
     check so truncation fails loudly instead of hitting the generic "no text content" path.
     Rebased onto latest main and re-pushed; lint/build still clean.
   </engineer_notes>
+  <pm_notes>
+    Reviewed 2026-08-05, PR #7 — changes requested, not merged. SECURITY DEFINER boundary and
+    never-auto-send constraint are both handled correctly. One specific bug: the request omits
+    `thinking`, which defaults to adaptive-on for claude-opus-5 (unlike Opus 4.8/4.7 where
+    omitting it meant no thinking), and `max_tokens: 1024` is a hard cap on thinking + response
+    text combined — very likely too small once thinking is running, meaning `analyzeCheckin` gets
+    no text block, throws, and the try/catch in submitCheckin silently swallows it. Net effect:
+    the AI summary/risk-flag/draft-reply — this product's core differentiator — could silently
+    never populate for any check-in, with no error surfaced anywhere. Left an inline comment on
+    src/lib/anthropic.ts with two fixes (raise max_tokens to ~4096-8192, or explicitly disable
+    thinking) and a suggestion to branch on stop_reason === "max_tokens" separately from
+    "refusal" so a truncation fails loudly instead of hitting the generic no-text-content path.
+    TSK-010 stays blocked until this merges.
+  </pm_notes>
 </task_item>
 
 <task_item>
@@ -307,7 +321,7 @@ Schema: see `PM_CHARTER.md` / `ai-engineering-loop` skill.
 <task_item>
   <id>TSK-011</id>
   <source>OWNER_POPUP</source>
-  <status>READY_FOR_PM</status>
+  <status>DONE</status>
   <priority>LOW</priority>
   <title>Marketing landing page</title>
   <description>
@@ -327,6 +341,11 @@ Schema: see `PM_CHARTER.md` / `ai-engineering-loop` skill.
 
     PR #9 merged to main 2026-08-05.
   </engineer_notes>
+  <pm_notes>
+    Reviewed and merged 2026-08-05 (PR #9, squash merge, commit 2185adb). Correctly scoped —
+    pricing table sourced from lib/billing.ts's PLAN_TIERS instead of hardcoded, so it can't drift
+    from TSK-009's actual Stripe-gated tiers. Static page, no backend surface, nothing to flag.
+  </pm_notes>
 </task_item>
 
 <task_item>
@@ -409,7 +428,7 @@ Schema: see `PM_CHARTER.md` / `ai-engineering-loop` skill.
 <task_item>
   <id>TSK-016</id>
   <source>ENGINEER_SQUAD</source>
-  <status>READY_FOR_PM</status>
+  <status>DONE</status>
   <priority>MEDIUM</priority>
   <title>Coach-facing UI to configure check-in cadence &amp; questions per client</title>
   <description>
@@ -436,6 +455,11 @@ Schema: see `PM_CHARTER.md` / `ai-engineering-loop` skill.
 
     PR #8 merged to main 2026-08-05.
   </engineer_notes>
+  <pm_notes>
+    Reviewed and merged 2026-08-05 (PR #8, squash merge, commit 5bf9cb3). Relies on the same
+    RLS-scoped-update pattern as TSK-006/TSK-009's addClient — correct and consistent. Missing DB
+    check constraint on cadence is a fair non-blocking nit for later, not required for this task.
+  </pm_notes>
 </task_item>
 
 <task_item>
