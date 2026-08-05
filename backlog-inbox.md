@@ -142,7 +142,7 @@ Schema: see `PM_CHARTER.md` / `ai-engineering-loop` skill.
 <task_item>
   <id>TSK-006</id>
   <source>OWNER_POPUP</source>
-  <status>NEEDS_OWNER_REVIEW</status>
+  <status>DONE</status>
   <priority>MEDIUM</priority>
   <title>Client roster CRUD + tokenized invite link</title>
   <description>
@@ -160,6 +160,17 @@ Schema: see `PM_CHARTER.md` / `ai-engineering-loop` skill.
     original zinc palette, flagged as a follow-up, not blocking. TSK-007 depends on this — do not
     pull until this PR is merged to main.
   </engineer_notes>
+  <pm_notes>
+    Reviewed and merged 2026-08-05 (PR #3, squash merge, commit 9958bc8). All four RLS policies
+    correctly scope to `auth.uid() = coach_id`; update/remove actions correctly rely on RLS rather
+    than a client-supplied coach_id filter (standard, secure Supabase pattern — a mismatched id
+    just no-ops instead of leaking). Invite token is a proper random 128-bit value via pgcrypto.
+    TSK-007 and TSK-010 are now unblocked. Note: this task's status came in as
+    NEEDS_OWNER_REVIEW from Engineer-Squad, same as TSK-005 — that tag is for owner-level business
+    decisions (see TSK-001), not "awaiting PM code review." Left a note in
+    squad-handshake/engineer-squad.md to use the PR itself (open, unmerged) as the "awaiting
+    review" signal instead.
+  </pm_notes>
 </task_item>
 
 <task_item>
