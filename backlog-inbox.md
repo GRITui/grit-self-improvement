@@ -317,6 +317,8 @@ Schema: see `PM_CHARTER.md` / `ai-engineering-loop` skill.
     the older zinc/dark-mode scaffold styling, left untouched as out of scope. Build/lint clean;
     no local Playwright browser available to screenshot, so verified via rendered HTML markup
     instead.
+
+    PR #9 merged to main 2026-08-05.
   </engineer_notes>
 </task_item>
 
@@ -424,6 +426,8 @@ Schema: see `PM_CHARTER.md` / `ai-engineering-loop` skill.
     (no DB check constraint on that column) — flagged in the PR in case PM wants one added later.
     Build/lint clean; full DB round trip unverified (no live Supabase project in this
     environment).
+
+    PR #8 merged to main 2026-08-05.
   </engineer_notes>
 </task_item>
 
