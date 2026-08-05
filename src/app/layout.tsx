@@ -9,7 +9,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "GritDesk",
+  title: "FollowThru",
   description: "An AI accountability copilot for coaches.",
 };
 
