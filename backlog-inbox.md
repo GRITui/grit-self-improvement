@@ -239,6 +239,13 @@ Schema: see `PM_CHARTER.md` / `ai-engineering-loop` skill.
     Claude API (reaches auth check, not a 400) with a placeholder key; full round trip needs a
     real Supabase + Anthropic project. TSK-010 depends on this — do not pull until this PR is
     merged to main.
+
+    PM review 2026-08-05 caught a real bug: max_tokens: 1024 was too small to hold Opus 5's
+    default-on adaptive thinking plus the JSON response, which would have silently produced empty
+    AI analysis on every check-in (caught by the best-effort try/catch with no surfaced error).
+    Fixed in commit 2a52ea7: raised max_tokens to 8192 and added a stop_reason === "max_tokens"
+    check so truncation fails loudly instead of hitting the generic "no text content" path.
+    Rebased onto latest main and re-pushed; lint/build still clean.
   </engineer_notes>
 </task_item>
 

@@ -8,11 +8,21 @@
 ## Current Focus
 TSK-005, TSK-006, TSK-007, TSK-015, TSK-009, TSK-016, and TSK-011 are all merged to `main`. Only
 TSK-008 (PR #7, AI check-in summarization/risk/draft-reply, includes TSK-017's footer fix) is
-still open awaiting PM review. TSK-010 (dashboard UI) stays blocked until PR #7 merges — that's
-the only remaining Engineer-Squad-buildable item not already shipped or in flight. TSK-012/013/014
-are QA-Squad tasks. TSK-018 is an owner tracking checklist, not directly buildable.
+still open. TSK-010 (dashboard UI) stays blocked until PR #7 merges — that's the only remaining
+Engineer-Squad-buildable item not already shipped or in flight. TSK-012/013/014 are QA-Squad
+tasks. TSK-018 is an owner tracking checklist, not directly buildable.
 
-Idle, waiting on PR #7. Will pick up TSK-010 the moment it merges.
+**PM review on PR #7, 2026-08-05:** caught a real bug — `max_tokens: 1024` in
+`src/lib/anthropic.ts` was too small to hold Opus 5's default-on adaptive thinking plus the JSON
+response, which would have silently produced empty AI analysis on every check-in (the best-effort
+try/catch swallowed the resulting error with nothing surfaced anywhere). Fixed same-day: raised
+`max_tokens` to 8192, added a `stop_reason === "max_tokens"` check to fail loudly on truncation
+instead of hitting the generic "no text content" path, rebased onto latest `main`, re-pushed
+(commit 2a52ea7), replied on the PR. Worth noting for future Claude API work in this repo: Opus 5
+thinking is on by default and shares the `max_tokens` budget with the response — budget
+generously.
+
+Idle, waiting on PR #7 re-review. Will pick up TSK-010 the moment it merges.
 
 **Owner decision 2026-08-05: product renamed "GritDesk" -> "FollowThru"** (TSK-001) — carried
 into app code via TSK-015/PR #5, merged.
@@ -28,7 +38,8 @@ forward.
 ## Recent Commits / PRs
 * PR #7: https://github.com/GRITui/grit-self-improvement/pull/7 — TSK-008 AI check-in
   summarization/risk-flag/draft-reply via Claude (claude-opus-5, structured JSON output), plus
-  TSK-017's "Powered by GritDesk" -> "FollowThru" footer fix as a second commit. Status: **open**.
+  TSK-017's "Powered by GritDesk" -> "FollowThru" footer fix as a second commit. Status: **open**
+  (max_tokens fix pushed 2026-08-05 per PM review, see note above).
 * PR #8: https://github.com/GRITui/grit-self-improvement/pull/8 — TSK-016 coach-facing check-in
   cadence & questions editor on /dashboard/clients (add/remove/reorder up to 5 questions, cadence
   select). No migration — reuses TSK-007's clients.cadence/questions columns. Status: **merged**.
