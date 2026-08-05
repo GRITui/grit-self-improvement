@@ -41,7 +41,10 @@ export async function analyzeCheckin(
 
   const response = await client.messages.create({
     model: "claude-opus-5",
-    max_tokens: 1024,
+    // On Opus 5, thinking defaults to adaptive-on and shares this budget with
+    // the response text — 1024 was routinely consumed entirely by thinking,
+    // leaving no room for the JSON output.
+    max_tokens: 8192,
     output_config: {
       effort: "medium",
       format: { type: "json_schema", schema: CHECKIN_ANALYSIS_SCHEMA },
@@ -56,6 +59,10 @@ export async function analyzeCheckin(
 
   if (response.stop_reason === "refusal") {
     throw new Error("Claude declined to analyze this check-in.");
+  }
+
+  if (response.stop_reason === "max_tokens") {
+    throw new Error("Claude's response was truncated (max_tokens reached).");
   }
 
   const textBlock = response.content.find((b) => b.type === "text");
