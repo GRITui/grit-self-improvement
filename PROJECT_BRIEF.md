@@ -1,4 +1,4 @@
-# Project Brief — "GritDesk" (working title)
+# Project Brief — "FollowThru" (formerly "GritDesk"/"Grit")
 
 Status: DRAFT v1 — owned by PM (Owner-Assistant), seeded 2026-08-05. Researcher-Squad should
 deepen/challenge this, not treat it as fixed truth.
@@ -6,6 +6,9 @@ deepen/challenge this, not treat it as fixed truth.
 Revision log: 2026-08-05 — Researcher-Squad (TSK-001) added market/ICP validation notes to
 Sections 1 and 3, and resolved the brand-name risk in Section 8 with 3 researched alternatives.
 2026-08-05 — Researcher-Squad (TSK-002) appended Section 9, a lightweight GTM plan.
+2026-08-05 — Owner approved "FollowThru" as the product name (TSK-001 resolved). Renamed
+throughout this doc; see TSK-015 in backlog-inbox.md for the app-code/UI rename Engineer-Squad
+still needs to do.
 
 ## 1. Problem & Opportunity
 
@@ -40,7 +43,7 @@ no such competitor exists anywhere.
 
 ## 2. Product Concept
 
-**GritDesk** — an AI accountability copilot for coaches.
+**FollowThru** — an AI accountability copilot for coaches.
 
 - Coach sets up clients and a recurring check-in (weekly cadence, custom questions).
 - Client fills out the check-in via a tokenized web link — **no app install, no client login**.
@@ -62,7 +65,7 @@ revenue.
 research on what coaches already pay for adjacent tools — Plutio $19/mo, Quenza $25/mo, Dubsado
 $40/mo, Practice $28/mo, Practice Better $29–79/mo, CoachAccountable Solo $40/mo for 10 clients /
 Team $90/mo for 50 clients, up to Kajabi $149/mo and GoHighLevel $97/mo. This is direct evidence
-of an established willingness to pay $20–90+/mo in this exact buyer segment, and GritDesk's
+of an established willingness to pay $20–90+/mo in this exact buyer segment, and FollowThru's
 proposed Starter tier ($29/mo up to 10 clients) undercuts CoachAccountable's equivalent Solo tier
 ($40/mo) — a concrete wedge on price for the same client-count band, not just on features.
 Retention-focused coaching content also confirms coaches actively watch for the disengagement
@@ -119,7 +122,7 @@ Repo layout: scaffold the Next.js app at the repo root using standard App Router
 
 ## 7. Differentiation Summary
 
-| | Competitors (CoachAccountable/Quenza/Satori) | GritDesk |
+| | Competitors (CoachAccountable/Quenza/Satori) | FollowThru |
 |---|---|---|
 | Client friction | Client app/login required | Tokenized link, zero friction |
 | Check-in triage | Coach reads everything manually | AI summary + risk flag + draft reply |
@@ -157,6 +160,10 @@ Repo layout: scaffold the Next.js app at the repo root using standard App Router
   stablecoin), Foothold (Foothold Technology, behavioral-health EHR), Keelframe (existing maritime
   engineering SaaS), Groundwire (existing faith-based coaching platform), OnDeck/SteadyPoint
   (existing unrelated SaaS products).
+
+  **Owner decision (2026-08-05):** approved "FollowThru" as the product name. Still outstanding
+  before public launch: a real trademark/domain check (this screening was web search only, not
+  authoritative). TSK-015 tracks the app-code/UI rename.
 - AI summarization quality/liability: coach must review before sending, never auto-send.
 - Cold-start distribution: no existing audience. Early GTM likely coaching Facebook
   groups/subreddits/IndieHackers — Researcher-Squad to scope a lightweight GTM plan post-MVP.

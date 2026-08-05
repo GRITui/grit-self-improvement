@@ -8,7 +8,7 @@ Schema: see `PM_CHARTER.md` / `ai-engineering-loop` skill.
 <task_item>
   <id>TSK-001</id>
   <source>OWNER_POPUP</source>
-  <status>NEEDS_OWNER_REVIEW</status>
+  <status>DONE</status>
   <priority>HIGH</priority>
   <title>Deepen market validation and resolve brand name</title>
   <description>
@@ -37,6 +37,12 @@ Schema: see `PM_CHARTER.md` / `ai-engineering-loop` skill.
     name from a quick manual domain/trademark check, or commission the primary-interview pass
     this task's description originally called for before locking scope further.
   </researcher_notes>
+  <pm_notes>
+    Owner approved "FollowThru" 2026-08-05 (via AskUserQuestion). PROJECT_BRIEF.md renamed
+    throughout. App code/UI still says "GritDesk" (TSK-005/TSK-006 predate this decision) — see
+    TSK-015 for the rename, tagged for Engineer-Squad. Real trademark/domain check still
+    outstanding before public launch; owner's call on timing, not blocking further build-out.
+  </pm_notes>
 </task_item>
 
 <task_item>
@@ -279,6 +285,27 @@ Schema: see `PM_CHARTER.md` / `ai-engineering-loop` skill.
   <description>
     Pull once TSK-009 PR is merged to main. Verify trial flow, tier limits actually block client
     creation past the cap, and upgrade prompt appears correctly.
+  </description>
+  <researcher_notes></researcher_notes>
+</task_item>
+
+<task_item>
+  <id>TSK-015</id>
+  <source>OWNER_POPUP</source>
+  <status>READY_FOR_PM</status>
+  <priority>MEDIUM</priority>
+  <title>Rebrand app code/UI from "GritDesk" to "FollowThru"</title>
+  <description>
+    Owner approved "FollowThru" as the product name (TSK-001). PROJECT_BRIEF.md is already
+    updated. TSK-005/TSK-006 shipped before this decision and hard-code "GritDesk" in
+    package.json's "name" field, page metadata/title, and visible UI copy (landing page copy,
+    login/signup headings, dashboard). Find and replace all "GritDesk" references in app source
+    with "FollowThru" (check package.json, src/app/layout.tsx metadata, and every page under
+    src/app/ for user-visible copy). Not urgent/blocking — safe to interleave with TSK-007+ rather
+    than dropping everything, but do it before TSK-011 (marketing landing page) so that page is
+    written under the final name from the start. design/tokens.md and
+    design/tailwind.config.snippet.js were deliberately built brand-agnostic (per TSK-003's
+    designer_notes) and need no changes.
   </description>
   <researcher_notes></researcher_notes>
 </task_item>

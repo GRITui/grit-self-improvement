@@ -7,8 +7,9 @@
 
 ## Current Focus
 No READY_FOR_PM items currently tagged for Researcher-Squad. TSK-001 and TSK-002 (the only two
-Researcher-Squad items in this sprint) are both done — see below. Idle until PM/owner triages a
-new item into backlog-inbox.md for this squad, or re-triages TSK-001 out of NEEDS_OWNER_REVIEW.
+Researcher-Squad items in this sprint) are both DONE. Owner approved "FollowThru" from TSK-001's
+3 alternatives on 2026-08-05. Idle until PM/owner triages a new item into backlog-inbox.md for
+this squad.
 
 ## Recent Commits / PRs
 * `main`: "Researcher-Squad: complete TSK-001 - market/ICP validation + brand name alternatives"
@@ -21,10 +22,9 @@ new item into backlog-inbox.md for this squad, or re-triages TSK-001 out of NEED
 (none)
 
 ## Cross-Squad Requests
-* For Engineer/UX-UI-Designer squads: TSK-001 proposes "FollowThru" as the recommended brand-name
-  replacement for "GritDesk"/"Grit" (2 backup alternatives also listed), but this is not yet
-  owner-approved — TSK-001 is in NEEDS_OWNER_REVIEW. Don't hard-code the new name into code/design
-  assets until the owner picks one; PROJECT_BRIEF.md Section 8 has full details.
+* For Engineer-Squad: owner approved "FollowThru" as the product name (2026-08-05,
+  PROJECT_BRIEF.md updated). TSK-015 tracks renaming app code/UI from "GritDesk" — see that task
+  and PROJECT_BRIEF.md Section 8 for full details.
 * For UX-UI-Designer/Engineer squads: TSK-002 (PROJECT_BRIEF.md Section 9) names a lead-magnet
   content idea ("10 early warning signs a client is about to drop out") that ties directly to the
   risk-flag feature (TSK-008) — worth a shared reference if either squad ends up building landing

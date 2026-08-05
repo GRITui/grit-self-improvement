@@ -12,6 +12,12 @@ billing) has been unblocked since TSK-005 merged. Pull TSK-007 next per priority
 TSK-009's LOW) — note UX-UI-Designer-Squad left an open cross-squad request below about
 expired-token UX that TSK-007 should resolve before/while building.
 
+**Owner decision 2026-08-05: product renamed "GritDesk" → "FollowThru"** (TSK-001).
+PROJECT_BRIEF.md is updated; app code (package.json "name", page metadata, visible UI copy in
+TSK-005/006's output) still says "GritDesk" since it was built before this decision. TSK-015
+tracks the rename — do it before TSK-011 (landing page) so that page is written under the final
+name, but it can interleave after TSK-007 rather than jumping the queue.
+
 ## Recent Commits / PRs
 * PR #2: https://github.com/GRITui/grit-self-improvement/pull/2 — TSK-005 scaffold Next.js +
   Supabase + Tailwind with coach auth (email/password + Google OAuth), coaches table + RLS
