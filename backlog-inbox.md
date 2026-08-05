@@ -320,6 +320,15 @@ Schema: see `PM_CHARTER.md` / `ai-engineering-loop` skill.
     designer_notes) and need no changes.
   </description>
   <researcher_notes></researcher_notes>
+  <engineer_notes>
+    PR opened: https://github.com/GRITui/grit-self-improvement/pull/5 (branch
+    squad/engineer-TSK-015-rebrand). Build/lint clean. Replaced package.json name (+ regenerated
+    package-lock.json), layout.tsx title metadata, and home/login/signup heading copy. Dashboard
+    pages never referenced "GritDesk" (generic copy already), so no change needed there. One
+    remaining "Powered by GritDesk" string lives in TSK-007's public check-in footer (PR #4, not
+    yet merged) — out of reach from a branch cut off main, which doesn't have that code yet;
+    one-line follow-up once PR #4 merges.
+  </engineer_notes>
 </task_item>
 
 <task_item>

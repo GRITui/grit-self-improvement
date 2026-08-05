@@ -2,18 +2,19 @@
   <squad_name>Engineer-Squad</squad_name>
   <current_status>IDLE</current_status>
   <active_task_id></active_task_id>
-  <sprint_completion_percentage>33</sprint_completion_percentage>
+  <sprint_completion_percentage>40</sprint_completion_percentage>
 </squad_metadata>
 
 ## Current Focus
-TSK-005 and TSK-006 are merged. TSK-007 (public client check-in flow) is built/tested and in
-PR #4 awaiting PM review. Per PM's guidance on TSK-001, next up is TSK-015 (rebrand app code/UI
-"GritDesk" -> "FollowThru") before TSK-011 (landing page) gets written under the old name.
-TSK-008 stays blocked until PR #4 merges; TSK-009 (Stripe billing, LOW priority) remains an
-unblocked fallback if TSK-015 turns out blocked for some reason.
+TSK-005 and TSK-006 are merged. TSK-007 is built/tested and in PR #4 awaiting PM review. TSK-015
+(rebrand to FollowThru) is also built/tested and in PR #5 awaiting PM review. Next unblocked
+MEDIUM-priority candidate is TSK-016 (coach-facing cadence/questions config UI, no formal
+dependency beyond already-merged TSK-006). TSK-008/TSK-010 stay blocked until PR #4 merges;
+TSK-009 (Stripe billing, LOW priority) remains a fallback.
 
-**Owner decision 2026-08-05: product renamed "GritDesk" -> "FollowThru"** (TSK-001). Not yet
-carried into app code — TSK-015 is next.
+**Owner decision 2026-08-05: product renamed "GritDesk" -> "FollowThru"** (TSK-001). Carried into
+app code via TSK-015/PR #5, except one "Powered by GritDesk" string in TSK-007's (still-open)
+check-in footer — one-line follow-up once PR #4 merges.
 
 ## Recent Commits / PRs
 * PR #2: https://github.com/GRITui/grit-self-improvement/pull/2 — TSK-005 scaffold Next.js +
@@ -27,6 +28,9 @@ carried into app code — TSK-015 is next.
   flow: checkins table + SECURITY DEFINER functions for anonymous token-scoped access, cadence/
   questions on clients, coaches.full_name for the check-in page header. Status: open, awaiting
   PM review.
+* PR #5: https://github.com/GRITui/grit-self-improvement/pull/5 — TSK-015 rebrand app code/UI
+  "GritDesk" -> "FollowThru" (package.json, page metadata, home/login/signup copy). Status: open,
+  awaiting PM review.
 
 ## Blockers & QA Failures
 (none yet)
