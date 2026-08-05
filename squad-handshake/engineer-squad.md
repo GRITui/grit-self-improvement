@@ -2,21 +2,19 @@
   <squad_name>Engineer-Squad</squad_name>
   <current_status>IDLE</current_status>
   <active_task_id></active_task_id>
-  <sprint_completion_percentage>40</sprint_completion_percentage>
+  <sprint_completion_percentage>47</sprint_completion_percentage>
 </squad_metadata>
 
 ## Current Focus
-TSK-005 and TSK-006 are merged. TSK-007 is built/tested and in PR #4 awaiting PM review. TSK-015
-(rebrand to FollowThru) is also built/tested and in PR #5 awaiting PM review. Correcting an
-earlier note: TSK-016 (cadence/questions config UI) is NOT actually unblocked yet, despite
-having no explicit "Depends on" line — it needs the `cadence`/`questions` columns on `clients`,
-which only exist in TSK-007's migration (PR #4, unmerged). Pulling TSK-009 (Stripe billing)
-instead — genuinely unblocked (only needs TSK-005/TSK-006, both merged). TSK-008/TSK-010 stay
-blocked until PR #4 merges; TSK-016 stays pending on the same.
+TSK-005 and TSK-006 are merged. TSK-007 (PR #4), TSK-015 (PR #5), and TSK-009 (PR #6) are all
+built/tested and awaiting PM review. Genuinely nothing left to pull right now: TSK-008/TSK-016
+need PR #4 merged first, TSK-010 needs TSK-008, and TSK-011 should wait for PR #5 (rebrand) to
+merge so the landing page is written under the final name rather than needing a rename pass
+right after. Going IDLE, watching all three open PRs; will resume the moment any merges.
 
 **Owner decision 2026-08-05: product renamed "GritDesk" -> "FollowThru"** (TSK-001). Carried into
-app code via TSK-015/PR #5, except one "Powered by GritDesk" string in TSK-007's (still-open)
-check-in footer — one-line follow-up once PR #4 merges.
+app code via TSK-015/PR #5 (not yet merged). One "Powered by GritDesk" string remains in TSK-007's
+(also unmerged) check-in footer — one-line follow-up once both land.
 
 ## Recent Commits / PRs
 * PR #2: https://github.com/GRITui/grit-self-improvement/pull/2 — TSK-005 scaffold Next.js +
@@ -33,6 +31,9 @@ check-in footer — one-line follow-up once PR #4 merges.
 * PR #5: https://github.com/GRITui/grit-self-improvement/pull/5 — TSK-015 rebrand app code/UI
   "GritDesk" -> "FollowThru" (package.json, page metadata, home/login/signup copy). Status: open,
   awaiting PM review.
+* PR #6: https://github.com/GRITui/grit-self-improvement/pull/6 — TSK-009 Stripe subscription
+  billing + plan gating: coaches billing columns, Stripe webhook handler, /dashboard/billing,
+  gating wired into TSK-006's addClient. Status: open, awaiting PM review.
 
 ## Blockers & QA Failures
 (none yet)

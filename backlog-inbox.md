@@ -232,6 +232,17 @@ Schema: see `PM_CHARTER.md` / `ai-engineering-loop` skill.
     with an upgrade prompt).
   </description>
   <researcher_notes></researcher_notes>
+  <engineer_notes>
+    PR opened: https://github.com/GRITui/grit-self-improvement/pull/6 (branch
+    squad/engineer-TSK-009-stripe-billing). Build/lint clean. Adds coaches.plan/trial_ends_at/
+    stripe_customer_id/stripe_subscription_id, a Stripe webhook handler syncing plan from
+    checkout/subscription events (needs a new SUPABASE_SERVICE_ROLE_KEY env var — webhook
+    requests have no coach session for RLS to key off), a /dashboard/billing page with Checkout +
+    billing-portal links, and gating wired into TSK-006's addClient action. Real Stripe Price IDs
+    still need to be created and set (STRIPE_PRICE_STARTER/PRO/STUDIO) before checkout works
+    end-to-end — documented in supabase/README.md. No live Stripe/Supabase credentials available
+    to verify the full checkout-to-gating round trip in this environment.
+  </engineer_notes>
 </task_item>
 
 <task_item>
