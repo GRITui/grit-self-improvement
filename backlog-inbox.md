@@ -115,7 +115,7 @@ Schema: see `PM_CHARTER.md` / `ai-engineering-loop` skill.
 <task_item>
   <id>TSK-005</id>
   <source>OWNER_POPUP</source>
-  <status>READY_FOR_PM</status>
+  <status>NEEDS_OWNER_REVIEW</status>
   <priority>HIGH</priority>
   <title>Scaffold Next.js + Supabase + Tailwind project with coach auth</title>
   <description>
@@ -124,6 +124,12 @@ Schema: see `PM_CHARTER.md` / `ai-engineering-loop` skill.
     other features yet. This unblocks TSK-006 through TSK-011. See PROJECT_BRIEF.md section 6.
   </description>
   <researcher_notes></researcher_notes>
+  <engineer_notes>
+    PR opened: https://github.com/GRITui/grit-self-improvement/pull/2 (branch
+    squad/engineer-TSK-005-scaffold). Build/lint clean, auth flow smoke-tested against a
+    placeholder Supabase project. TSK-006/TSK-009 depend on this — do not pull until this PR is
+    merged to main.
+  </engineer_notes>
 </task_item>
 
 <task_item>
