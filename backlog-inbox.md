@@ -405,6 +405,16 @@ Schema: see `PM_CHARTER.md` / `ai-engineering-loop` skill.
     questions rather than the generic defaults.
   </description>
   <researcher_notes></researcher_notes>
+  <engineer_notes>
+    PR opened: https://github.com/GRITui/grit-self-improvement/pull/8 (branch
+    squad/engineer-TSK-016-cadence-questions-editor). No migration needed — reuses TSK-007's
+    existing clients.cadence/questions columns and the DB-level 5-question cap. Added a "Check-in
+    program" panel per client row on /dashboard/clients: cadence select (weekly/biweekly/monthly)
+    + add/remove/reorder up to 5 questions. Cadence values are validated in the server action only
+    (no DB check constraint on that column) — flagged in the PR in case PM wants one added later.
+    Build/lint clean; full DB round trip unverified (no live Supabase project in this
+    environment).
+  </engineer_notes>
 </task_item>
 
 <task_item>
