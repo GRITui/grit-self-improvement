@@ -229,6 +229,17 @@ Schema: see `PM_CHARTER.md` / `ai-engineering-loop` skill.
     the check-in record.
   </description>
   <researcher_notes></researcher_notes>
+  <engineer_notes>
+    PR opened: https://github.com/GRITui/grit-self-improvement/pull/7 (branch
+    squad/engineer-TSK-008-ai-checkin-analysis). Build/lint clean. Uses claude-opus-5 with
+    structured JSON output (output_config.format) for a guaranteed-shape {summary, risk,
+    draft_reply} response. AI analysis is best-effort — wrapped in try/catch so a failure never
+    blocks check-in submission. draft_reply is stored only; nothing in the codebase sends it
+    (satisfies "never auto-send" by construction). Verified the request shape against the real
+    Claude API (reaches auth check, not a 400) with a placeholder key; full round trip needs a
+    real Supabase + Anthropic project. TSK-010 depends on this — do not pull until this PR is
+    merged to main.
+  </engineer_notes>
 </task_item>
 
 <task_item>
@@ -410,6 +421,11 @@ Schema: see `PM_CHARTER.md` / `ai-engineering-loop` skill.
     standalone.
   </description>
   <researcher_notes></researcher_notes>
+  <engineer_notes>
+    Folded into PR #7 (TSK-008) as a second commit — that PR already touches
+    src/app/checkin/[token]/ (actions.ts) and hadn't merged yet, so this rides along per PM's
+    suggestion rather than opening a separate PR. Changed the string to "Powered by FollowThru".
+  </engineer_notes>
 </task_item>
 
 <task_item>

@@ -1,18 +1,21 @@
 <squad_metadata>
   <squad_name>Engineer-Squad</squad_name>
-  <current_status>IDLE</current_status>
-  <active_task_id></active_task_id>
-  <sprint_completion_percentage>76</sprint_completion_percentage>
+  <current_status>IN_PROGRESS</current_status>
+  <active_task_id>TSK-016</active_task_id>
+  <sprint_completion_percentage>82</sprint_completion_percentage>
 </squad_metadata>
 
 ## Current Focus
-TSK-005, TSK-006, TSK-007, TSK-015, and TSK-009 are all merged to `main`. Now unblocked:
-TSK-008 (AI summarization, needs TSK-007 — done), TSK-016 (cadence/questions editor, needs
-TSK-007 — done), TSK-011 (landing page, was waiting on the rebrand — done), and TSK-017 (trivial
-"Powered by GritDesk" -> "FollowThru" string fix in the check-in footer, PM-raised). TSK-010
-(dashboard UI) still needs TSK-008 first. Suggest picking up TSK-008 next (unblocks TSK-010 too),
-and folding TSK-017's one-line fix into whichever task next touches
-src/app/checkin/[token]/page.tsx rather than opening a PR just for that.
+TSK-005, TSK-006, TSK-007, TSK-015, and TSK-009 are merged to `main`. TSK-008 (AI check-in
+summarization/risk/draft-reply) is built and open as PR #7 — folded TSK-017's one-line
+"GritDesk" -> "FollowThru" footer fix into the same PR as a second commit since it touches the
+same directory and PR #7 hadn't merged yet (per PM's suggestion). Branch was rebased onto latest
+main (which had picked up TSK-018's checklist commit) before pushing, so PR #7 should merge
+without conflict. TSK-010 (dashboard UI) stays blocked until PR #7 merges.
+
+Now pulling TSK-016 (coach-facing cadence/questions editor) next — unblocked since TSK-007's
+`cadence`/`questions` columns are on `main`. TSK-011 (landing page) is also unblocked and queued
+after.
 
 **Owner decision 2026-08-05: product renamed "GritDesk" -> "FollowThru"** (TSK-001) — carried
 into app code via TSK-015/PR #5, merged.
@@ -26,6 +29,9 @@ auto-rejected. If you rebase onto latest main before opening a PR, this is easy 
 forward.
 
 ## Recent Commits / PRs
+* PR #7: https://github.com/GRITui/grit-self-improvement/pull/7 — TSK-008 AI check-in
+  summarization/risk-flag/draft-reply via Claude (claude-opus-5, structured JSON output), plus
+  TSK-017's "Powered by GritDesk" -> "FollowThru" footer fix as a second commit. Status: **open**.
 * PR #2: https://github.com/GRITui/grit-self-improvement/pull/2 — TSK-005 scaffold Next.js +
   Supabase + Tailwind with coach auth (email/password + Google OAuth), coaches table + RLS
   migration. Status: **merged** (PM review 2026-08-05, squash commit 8b86130).
