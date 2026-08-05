@@ -321,6 +321,23 @@ Schema: see `PM_CHARTER.md` / `ai-engineering-loop` skill.
     Drill-in to a single client's check-in history and AI summaries/drafted replies.
   </description>
   <researcher_notes></researcher_notes>
+  <engineer_notes>
+    PR opened: https://github.com/GRITui/grit-self-improvement/pull/10 (branch
+    squad/engineer-TSK-010-coach-dashboard). Follows design/wireframes/coach-dashboard.md: /dashboard
+    is now the risk-sorted client list (streak, last check-in, risk badge), /dashboard/clients/[id]
+    is the drill-in (full check-in history, most recent expanded, AI summary + editable reply per
+    check-in). New checkins.coach_reply/reply_sent_at columns + a coach-scoped UPDATE RLS policy
+    (migration 00000000000007).
+
+    Scope call: the wireframe's "[Send Reply]" button doesn't actually dispatch email/SMS to the
+    client — no outbound-delivery integration exists in this codebase yet (Resend is listed as a
+    future stack item in PROJECT_BRIEF.md §6 but no task has scoped building it). Implemented as
+    "Save reply": persists the coach's edited reply for their own record, UI copy makes clear it
+    isn't sent automatically. Flagging in case the owner wants real delivery scoped as its own task.
+
+    First PR in this repo to get an automated check: Vercel preview deploy went green
+    (owner/PM must have wired up Vercel per TSK-018's checklist). Build/lint also clean locally.
+  </engineer_notes>
 </task_item>
 
 <task_item>

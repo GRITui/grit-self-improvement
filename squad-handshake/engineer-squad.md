@@ -6,10 +6,15 @@
 </squad_metadata>
 
 ## Current Focus
-Every task through TSK-017 is now merged to `main`. **TSK-010 (coach dashboard UI) is the only
-remaining Engineer-Squad-buildable item** — it needed TSK-006 and TSK-008, both merged. Pull that
-next. TSK-012/013/014 are QA-Squad tasks; TSK-018 is an owner tracking checklist, not directly
-buildable.
+Every task through TSK-017 is merged to `main`. TSK-010 (coach dashboard UI) is built and open as
+PR #10 — the last Engineer-Squad-buildable item in the current backlog. TSK-012/013/014 are
+QA-Squad tasks; TSK-018 is an owner tracking checklist, not directly buildable. Going idle pending
+PR #10 review.
+
+**Note: this repo now has an automated check.** PR #10 is the first PR here to get a Vercel
+preview-deploy status check (owner/PM must have wired this up, likely part of TSK-018's checklist)
+— it went green. Future PRs should expect this check to run; watch for it going red as real CI
+signal, not just local lint/build.
 
 **PM review on PR #7, 2026-08-05 (worth remembering for future Claude API work in this repo):**
 caught a real bug — `max_tokens: 1024` in `src/lib/anthropic.ts` was too small to hold Opus 5's
@@ -34,6 +39,13 @@ auto-rejected. If you rebase onto latest main before opening a PR, this is easy 
 forward.
 
 ## Recent Commits / PRs
+* PR #10: https://github.com/GRITui/grit-self-improvement/pull/10 — TSK-010 coach dashboard UI:
+  /dashboard is now the risk-sorted client list (streak/last-check-in/risk badge),
+  /dashboard/clients/[id] is the drill-in (check-in history, AI summary, editable reply seeded
+  from TSK-008's draft). New checkins.coach_reply/reply_sent_at + coach-scoped UPDATE RLS policy.
+  "Send Reply" implemented as "Save reply" (persists only) since no outbound-delivery integration
+  exists yet — see engineer_notes on TSK-010 in backlog-inbox.md. Status: **open**, Vercel preview
+  green.
 * PR #7: https://github.com/GRITui/grit-self-improvement/pull/7 — TSK-008 AI check-in
   summarization/risk-flag/draft-reply via Claude (claude-opus-5, structured JSON output), plus
   TSK-017's "Powered by GritDesk" -> "FollowThru" footer fix as a second commit. Status:
