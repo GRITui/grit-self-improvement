@@ -3,6 +3,9 @@
 Status: DRAFT v1 — owned by PM (Owner-Assistant), seeded 2026-08-05. Researcher-Squad should
 deepen/challenge this, not treat it as fixed truth.
 
+Revision log: 2026-08-05 — Researcher-Squad (TSK-001) added market/ICP validation notes to
+Sections 1 and 3, and resolved the brand-name risk in Section 8 with 3 researched alternatives.
+
 ## 1. Problem & Opportunity
 
 Two markets were compared during initial research:
@@ -20,6 +23,19 @@ Two markets were compared during initial research:
 **Decision: build for the coach (B2B), not the end consumer.** Sell to solo coaches/consultants
 who run structured accountability or "grit"/resilience-building programs with clients, and use AI
 to remove their single biggest time sink — reading and responding to client check-ins.
+
+**Researcher-Squad validation (TSK-001, 2026-08-05):** Desk research (coaching blogs/forums,
+review sites, IndieHackers threads — not primary interviews) corroborates both the pain point and
+the differentiation gap. Coaches consistently describe admin burden and fragmented check-in/tool
+sprawl as a top time sink as their client count grows. Separately, coach-facing material on client
+retention lists the exact early-disengagement signals an AI risk-flag feature would need to
+detect — terse check-in answers, slowing reply times, missed/late sessions — which validates that
+the risk-flag concept maps to real coach behavior, not just a nice-to-have. Search across AI
+coaching-tool coverage and named products (CoachPulse, PulseCheck, Delenta, etc.) turned up
+AI note-taking, generic "AI-powered CRM" re-engagement suggestions, and single-purpose pulse-check
+tools, but no product combining check-in summarization + dropout-risk flag + drafted reply in one
+workflow — the differentiation claim in Section 7 holds under this search, though it is not proof
+no such competitor exists anywhere.
 
 ## 2. Product Concept
 
@@ -41,8 +57,24 @@ Notion. Pain: hours/week reading and replying to check-ins; clients go quiet and
 too late (churn). Willing to pay because time saved and better retention directly protects their
 revenue.
 
-Researcher-Squad TODO: validate this with real interviews/forum research (r/coaching,
-r/lifecoach, IndieHackers) before we lock scope further.
+**Researcher-Squad validation (TSK-001, 2026-08-05):** ICP and pricing are supported by desk
+research on what coaches already pay for adjacent tools — Plutio $19/mo, Quenza $25/mo, Dubsado
+$40/mo, Practice $28/mo, Practice Better $29–79/mo, CoachAccountable Solo $40/mo for 10 clients /
+Team $90/mo for 50 clients, up to Kajabi $149/mo and GoHighLevel $97/mo. This is direct evidence
+of an established willingness to pay $20–90+/mo in this exact buyer segment, and GritDesk's
+proposed Starter tier ($29/mo up to 10 clients) undercuts CoachAccountable's equivalent Solo tier
+($40/mo) — a concrete wedge on price for the same client-count band, not just on features.
+Retention-focused coaching content also confirms coaches actively watch for the disengagement
+signals (short answers, slow replies, missed check-ins) this product's risk flag is built to
+surface, reinforcing that "clients go quiet and I notice too late" is a real, named pain point in
+the coaching community, not an invented one.
+
+**Caveat / still open:** this is secondary/desk research (search of existing threads, review
+sites, and industry blog coverage), not primary interviews conducted directly with coaches on
+r/coaching, r/lifecoach, or IndieHackers. Recommend the owner or a future task run 5–10 short
+primary interviews or a lightweight landing-page/waitlist test pre-MVP to confirm actual
+willingness to pay for *this specific* AI-summarization wedge (as opposed to coaching software
+generally, which the pricing data above only proves indirectly).
 
 ## 4. Monetization
 
@@ -97,6 +129,33 @@ Repo layout: scaffold the Next.js app at the repo root using standard App Router
 
 - "Grit" as a brand name likely has trademark/collision issues (multiple existing apps) — treat
   as a working title only; Researcher-Squad to propose 3 alternatives.
+
+  **Researcher-Squad findings (TSK-001, 2026-08-05):** collision risk confirmed, and worse than
+  the original brief implied. "Grit: Daily Habit Tracker" (GrittyApps) has 2.5M+ downloads and is
+  reported around $90K/mo revenue on gritapp.net — a large, established, directly-adjacent
+  (habit-tracking) product using the bare name "Grit." Additionally "CoachDesk" already exists as
+  a coaching-admin product name, which collides closely with the current working title
+  "GritDesk," and "CoachPulse" is independently reused by at least four unrelated apps across
+  team/personal/fitness coaching — ruled out as a fallback direction too.
+
+  Three alternatives proposed (screened via web search for existing products/apps only — not a
+  formal USPTO trademark or domain-registration search, which the owner should still run before
+  committing):
+  1. **FollowThru** (or "FollowThru Coach") — *recommended*. Directly evokes the core value prop
+     (helping coaches follow through on every client check-in). No existing coaching-software
+     product found under this name in search.
+  2. **Tallyline** — evokes tracking/tallying check-ins over an open line of contact with the
+     client. No existing product found under this name.
+  3. **Coachline** — plain and immediately legible to the ICP, but more generic/descriptive,
+     which likely makes it a weaker trademark than the other two even though no dedicated
+     existing product was found under this name.
+
+  Names considered and rejected due to confirmed collisions: Cadence (Cadence Design Systems),
+  Anchor (Spotify podcasting), Compass (Compass real estate), Traction (EOS Worldwide's coaching
+  methodology — direct competitive collision), Checkpoint (Check Point Software), Tether (Tether
+  stablecoin), Foothold (Foothold Technology, behavioral-health EHR), Keelframe (existing maritime
+  engineering SaaS), Groundwire (existing faith-based coaching platform), OnDeck/SteadyPoint
+  (existing unrelated SaaS products).
 - AI summarization quality/liability: coach must review before sending, never auto-send.
 - Cold-start distribution: no existing audience. Early GTM likely coaching Facebook
   groups/subreddits/IndieHackers — Researcher-Squad to scope a lightweight GTM plan post-MVP.

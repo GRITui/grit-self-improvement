@@ -8,7 +8,7 @@ Schema: see `PM_CHARTER.md` / `ai-engineering-loop` skill.
 <task_item>
   <id>TSK-001</id>
   <source>OWNER_POPUP</source>
-  <status>READY_FOR_PM</status>
+  <status>NEEDS_OWNER_REVIEW</status>
   <priority>HIGH</priority>
   <title>Deepen market validation and resolve brand name</title>
   <description>
@@ -18,7 +18,25 @@ Schema: see `PM_CHARTER.md` / `ai-engineering-loop` skill.
     multiple existing consumer apps named Grit). Update PROJECT_BRIEF.md sections 1, 3, and 8
     in place with findings; do not rewrite the whole doc.
   </description>
-  <researcher_notes></researcher_notes>
+  <researcher_notes>
+    Completed 2026-08-05 via desk research (WebSearch: coaching forums/blogs, review sites,
+    IndieHackers, app-store/product listings) — not primary interviews. PROJECT_BRIEF.md updated
+    in place: Section 1 (differentiation gap corroborated — no found competitor combines AI
+    check-in summarization + dropout-risk flag + drafted reply), Section 3 (ICP pain point and
+    $20-90+/mo willingness-to-pay corroborated via comparable coaching-software pricing;
+    Starter tier undercuts CoachAccountable's equivalent band), Section 8 (brand risk confirmed
+    worse than assumed — "Grit" habit tracker has 2.5M+ downloads/~$90K mo revenue; "CoachDesk"
+    and "CoachPulse" also collide — 3 alternatives proposed: FollowThru (recommended), Tallyline,
+    Coachline, plus a list of rejected names with their collisions).
+
+    Flagging NEEDS_OWNER_REVIEW rather than closing outright because two decisions need the
+    owner, not a squad: (1) picking/approving one of the 3 brand-name alternatives (or rejecting
+    all three) before Engineer/UX squads build against a name, and (2) the brand-name and
+    willingness-to-pay screening here is search-based desk research only — not a formal USPTO
+    trademark/domain search, and not primary interviews. Recommend the owner either greenlight a
+    name from a quick manual domain/trademark check, or commission the primary-interview pass
+    this task's description originally called for before locking scope further.
+  </researcher_notes>
 </task_item>
 
 <task_item>
