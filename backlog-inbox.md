@@ -182,7 +182,7 @@ Schema: see `PM_CHARTER.md` / `ai-engineering-loop` skill.
 <task_item>
   <id>TSK-007</id>
   <source>OWNER_POPUP</source>
-  <status>READY_FOR_PM</status>
+  <status>DONE</status>
   <priority>MEDIUM</priority>
   <title>Public client check-in flow</title>
   <description>
@@ -203,6 +203,17 @@ Schema: see `PM_CHARTER.md` / `ai-engineering-loop` skill.
     until this PR is merged to main. (Status intentionally left READY_FOR_PM, not
     NEEDS_OWNER_REVIEW, per PM's note on TSK-006 — the open PR is the "awaiting review" signal.)
   </engineer_notes>
+  <pm_notes>
+    Reviewed and merged 2026-08-05 (PR #4, squash merge, commit 03ce213). SECURITY DEFINER
+    functions correctly used instead of broadening RLS — anonymous access is scoped to exactly
+    the client whose 128-bit token they hold, no enumeration surface. `checkins` has no
+    insert/update/delete policy for anon/authenticated, so writes only happen through
+    `submit_checkin()` — correct default-deny. Accepted the "no self-service token regeneration"
+    default; not overriding. Known minor gap, not blocking: `submit_checkin` doesn't validate the
+    `answers` jsonb shape against the client's actual configured questions, and the still-stale
+    "Powered by GritDesk" footer string (TSK-015 branched before this PR existed) — small
+    follow-up, not tracked as a separate task yet. TSK-008 and TSK-016 unblocked.
+  </pm_notes>
 </task_item>
 
 <task_item>
@@ -223,7 +234,7 @@ Schema: see `PM_CHARTER.md` / `ai-engineering-loop` skill.
 <task_item>
   <id>TSK-009</id>
   <source>OWNER_POPUP</source>
-  <status>READY_FOR_PM</status>
+  <status>DONE</status>
   <priority>LOW</priority>
   <title>Stripe subscription billing + plan gating</title>
   <description>
@@ -243,6 +254,23 @@ Schema: see `PM_CHARTER.md` / `ai-engineering-loop` skill.
     end-to-end — documented in supabase/README.md. No live Stripe/Supabase credentials available
     to verify the full checkout-to-gating round trip in this environment.
   </engineer_notes>
+  <pm_notes>
+    Reviewed and merged 2026-08-05 (PR #6, squash merge, commit cbf8f14) — PR arrived with a
+    merge conflict against main (both this branch and PR #5's rebrand touched
+    package.json/package-lock.json, and this branch and PR #4's checkin work both added a new
+    type to src/lib/types.ts). Resolved manually: merged origin/main into the PR branch, kept
+    both additive type definitions in src/lib/types.ts (no logic conflict, just two features
+    landing in the same file), reinstalled deps, reran `npm run lint`/`npm run build` clean, force
+    push not needed — pushed as a merge commit to the PR branch, then merged via squash. Webhook
+    signature verification present (`stripe.webhooks.constructEvent`), admin/service-role client
+    scoped only to the webhook handler with a documented rationale, checkout/portal actions tied
+    to the authenticated coach's own `stripe_customer_id` — no cross-account access surface. Minor
+    non-blocking notes for a later pass: `checkout.session.completed` falls back to `"trialing"`
+    if `planIdFromPriceId` can't map the price (only hit if Stripe Price env vars are
+    misconfigured), the plan-limit check in `addClient` has a small TOCTOU race under concurrent
+    requests, and the client limit error is plain text rather than a link to /dashboard/billing.
+    None block MVP. TSK-014 (QA: billing & plan gating) is now unblocked.
+  </pm_notes>
 </task_item>
 
 <task_item>
@@ -315,7 +343,7 @@ Schema: see `PM_CHARTER.md` / `ai-engineering-loop` skill.
 <task_item>
   <id>TSK-015</id>
   <source>OWNER_POPUP</source>
-  <status>READY_FOR_PM</status>
+  <status>DONE</status>
   <priority>MEDIUM</priority>
   <title>Rebrand app code/UI from "GritDesk" to "FollowThru"</title>
   <description>
@@ -340,6 +368,12 @@ Schema: see `PM_CHARTER.md` / `ai-engineering-loop` skill.
     yet merged) — out of reach from a branch cut off main, which doesn't have that code yet;
     one-line follow-up once PR #4 merges.
   </engineer_notes>
+  <pm_notes>
+    Reviewed and merged 2026-08-05 (PR #5, squash merge, commit 5268ade). Simple, correctly
+    scoped text-only rename, no logic touched. Confirmed dashboard pages had no "GritDesk"
+    references as claimed. The one known leftover ("Powered by GritDesk" in the check-in footer,
+    PR #4) is now trackable since PR #4 merged first in this same sweep — see TSK-017.
+  </pm_notes>
 </task_item>
 
 <task_item>
@@ -358,6 +392,22 @@ Schema: see `PM_CHARTER.md` / `ai-engineering-loop` skill.
     view, alongside TSK-006's roster) — add/remove/reorder up to 5 questions, set cadence. Not
     blocking TSK-008/TSK-010, but needed before the product is usable with real, coach-specific
     questions rather than the generic defaults.
+  </description>
+  <researcher_notes></researcher_notes>
+</task_item>
+
+<task_item>
+  <id>TSK-017</id>
+  <source>PM</source>
+  <status>READY_FOR_PM</status>
+  <priority>LOW</priority>
+  <title>Fix stale "Powered by GritDesk" string on public check-in page</title>
+  <description>
+    TSK-007 (PR #4) shipped a "Powered by GritDesk" footer on src/app/checkin/[token]/page.tsx
+    because TSK-015's rebrand (PR #5) was cut from main before TSK-007 existed and couldn't reach
+    it. Both are merged now. One-line fix: change that string to "Powered by FollowThru". Trivial
+    scope, bundle with whatever Engineer-Squad task touches that file next if convenient, or take
+    standalone.
   </description>
   <researcher_notes></researcher_notes>
 </task_item>

@@ -6,18 +6,14 @@
 </squad_metadata>
 
 ## Current Focus
-No eligible task this cycle. Checked squad-handshake/engineer-squad.md (status IDLE, no PRs
-logged) and cross-referenced with GitHub: the only merged PR on `main` is PR #1 (the initial
-PM bootstrap of coordination files — PROJECT_BRIEF.md, PM_CHARTER.md, backlog-inbox.md,
-squad-handshake/*.md). No Engineer-Squad PR has been opened or merged yet, and the repo root
-contains no application code (`ls` shows only PM_CHARTER.md, PROJECT_BRIEF.md, README.md,
-backlog-inbox.md, squad-handshake/ — no Next.js scaffold).
-
-TSK-012 requires TSK-005/TSK-006 merged, TSK-013 requires TSK-007/TSK-008 merged, TSK-014
-requires TSK-009 merged — none of these prerequisite tasks have even been picked up by
-Engineer-Squad yet, so none of TSK-012/013/014 are pullable. Nothing else in backlog-inbox.md
-is tagged for QA-Tester-Squad. Standing by; will re-check next cycle once Engineer-Squad logs a
-merged PR in its handshake file.
+**Update from PM (2026-08-05):** this squad appears not to have run since its first cycle, and
+the prerequisites for two of its three tasks have since merged. TSK-012 (QA pass: auth & client
+roster) is pullable — TSK-005 and TSK-006 are both merged to `main`. TSK-014 (QA pass: billing &
+plan gating) is also pullable — TSK-009 is merged (note: no live Stripe/Supabase credentials were
+available to Engineer-Squad, so the checkout-to-gating round trip is only code-reviewed, not
+runtime-verified — worth prioritizing real end-to-end testing here if credentials become
+available). TSK-013 (check-in flow & AI summarization) is still blocked: TSK-007 is merged but
+TSK-008 (AI summarization) is not built yet. Pull TSK-012 first.
 
 ## Recent Commits / PRs
 (none yet)
