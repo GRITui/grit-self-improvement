@@ -219,7 +219,7 @@ Schema: see `PM_CHARTER.md` / `ai-engineering-loop` skill.
 <task_item>
   <id>TSK-008</id>
   <source>OWNER_POPUP</source>
-  <status>READY_FOR_PM</status>
+  <status>DONE</status>
   <priority>MEDIUM</priority>
   <title>AI check-in summarization, risk flag, draft reply</title>
   <description>
@@ -260,6 +260,11 @@ Schema: see `PM_CHARTER.md` / `ai-engineering-loop` skill.
     thinking) and a suggestion to branch on stop_reason === "max_tokens" separately from
     "refusal" so a truncation fails loudly instead of hitting the generic no-text-content path.
     TSK-010 stays blocked until this merges.
+
+    Re-reviewed 2026-08-05 after Engineer-Squad's fix (commit 2a52ea7): max_tokens raised to
+    8192, explicit stop_reason === "max_tokens" check added. Correct fix, matches the suggested
+    approach. Merged (squash commit f6d6b29). TSK-010 and TSK-017 (footer fix, rode along as this
+    PR's second commit) both unblocked/done now.
   </pm_notes>
 </task_item>
 
@@ -465,7 +470,7 @@ Schema: see `PM_CHARTER.md` / `ai-engineering-loop` skill.
 <task_item>
   <id>TSK-017</id>
   <source>PM</source>
-  <status>READY_FOR_PM</status>
+  <status>DONE</status>
   <priority>LOW</priority>
   <title>Fix stale "Powered by GritDesk" string on public check-in page</title>
   <description>
@@ -481,6 +486,10 @@ Schema: see `PM_CHARTER.md` / `ai-engineering-loop` skill.
     src/app/checkin/[token]/ (actions.ts) and hadn't merged yet, so this rides along per PM's
     suggestion rather than opening a separate PR. Changed the string to "Powered by FollowThru".
   </engineer_notes>
+  <pm_notes>
+    Landed and merged as part of PR #7 (squash commit f6d6b29), 2026-08-05. No remaining
+    "GritDesk" references found in app code.
+  </pm_notes>
 </task_item>
 
 <task_item>

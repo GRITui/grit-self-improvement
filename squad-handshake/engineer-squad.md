@@ -6,23 +6,21 @@
 </squad_metadata>
 
 ## Current Focus
-TSK-005, TSK-006, TSK-007, TSK-015, TSK-009, TSK-016, and TSK-011 are all merged to `main`. Only
-TSK-008 (PR #7, AI check-in summarization/risk/draft-reply, includes TSK-017's footer fix) is
-still open. TSK-010 (dashboard UI) stays blocked until PR #7 merges — that's the only remaining
-Engineer-Squad-buildable item not already shipped or in flight. TSK-012/013/014 are QA-Squad
-tasks. TSK-018 is an owner tracking checklist, not directly buildable.
+Every task through TSK-017 is now merged to `main`. **TSK-010 (coach dashboard UI) is the only
+remaining Engineer-Squad-buildable item** — it needed TSK-006 and TSK-008, both merged. Pull that
+next. TSK-012/013/014 are QA-Squad tasks; TSK-018 is an owner tracking checklist, not directly
+buildable.
 
-**PM review on PR #7, 2026-08-05:** caught a real bug — `max_tokens: 1024` in
-`src/lib/anthropic.ts` was too small to hold Opus 5's default-on adaptive thinking plus the JSON
-response, which would have silently produced empty AI analysis on every check-in (the best-effort
-try/catch swallowed the resulting error with nothing surfaced anywhere). Engineer-Squad fixed it
-same-day: raised `max_tokens` to 8192, added a `stop_reason === "max_tokens"` check to fail loudly
-on truncation instead of hitting the generic "no text content" path, rebased onto latest `main`,
-re-pushed (commit 2a52ea7). PM re-review of that fix is next. Worth noting for future Claude API
-work in this repo: Opus 5 thinking is on by default and shares the `max_tokens` budget with the
-response — budget generously.
-
-Idle, waiting on PR #7 re-review. Will pick up TSK-010 the moment it merges.
+**PM review on PR #7, 2026-08-05 (worth remembering for future Claude API work in this repo):**
+caught a real bug — `max_tokens: 1024` in `src/lib/anthropic.ts` was too small to hold Opus 5's
+default-on adaptive thinking plus the JSON response, which would have silently produced empty AI
+analysis on every check-in (the best-effort try/catch swallowed the resulting error with nothing
+surfaced anywhere). Fixed same-day (commit 2a52ea7): raised `max_tokens` to 8192, added a
+`stop_reason === "max_tokens"` check to fail loudly on truncation. Re-reviewed and merged (squash
+commit f6d6b29). **Takeaway: Opus 5 thinking is on by default and shares the `max_tokens` budget
+with the response — budget generously on any new Claude API call in this repo, and consider
+explicitly branching on `stop_reason` rather than assuming "no text block" means one specific
+failure mode.**
 
 **Owner decision 2026-08-05: product renamed "GritDesk" -> "FollowThru"** (TSK-001) — carried
 into app code via TSK-015/PR #5, merged.
@@ -38,8 +36,8 @@ forward.
 ## Recent Commits / PRs
 * PR #7: https://github.com/GRITui/grit-self-improvement/pull/7 — TSK-008 AI check-in
   summarization/risk-flag/draft-reply via Claude (claude-opus-5, structured JSON output), plus
-  TSK-017's "Powered by GritDesk" -> "FollowThru" footer fix as a second commit. Status: **open**
-  (max_tokens fix pushed 2026-08-05 per PM review, commit 2a52ea7 — see note above).
+  TSK-017's "Powered by GritDesk" -> "FollowThru" footer fix as a second commit. Status:
+  **merged** (PM re-review 2026-08-05 after the max_tokens fix, squash commit f6d6b29).
 * PR #8: https://github.com/GRITui/grit-self-improvement/pull/8 — TSK-016 coach-facing check-in
   cadence & questions editor on /dashboard/clients (add/remove/reorder up to 5 questions, cadence
   select). No migration — reuses TSK-007's clients.cadence/questions columns. Status: **merged**
@@ -67,15 +65,7 @@ forward.
   cbf8f14, after PM manually resolved a merge conflict — see note above).
 
 ## Blockers & QA Failures
-* **PR #7 (TSK-008) — was changes-requested by PM 2026-08-05, fix already pushed by
-  Engineer-Squad (commit 2a52ea7).** Original issue: the request omitted `thinking`, which
-  defaults to adaptive-on for `claude-opus-5` (unlike Opus 4.8/4.7, where omitting it meant no
-  thinking) — `max_tokens: 1024` is a hard cap on thinking + response text combined and was very
-  likely too small once thinking ran, so `analyzeCheckin` would get no text block, throw, and the
-  best-effort try/catch in `submitCheckin` would swallow it silently. Fix took the PM's suggested
-  path: raised `max_tokens` to 8192 (kept thinking on rather than disabling it) and added a
-  `stop_reason === "max_tokens"` check so a future truncation fails loudly instead of hitting the
-  generic no-text-content path. No longer a blocker pending PM's re-review of the pushed fix.
+(none — PR #7's max_tokens issue is resolved and merged; see Current Focus above)
 
 ## Cross-Squad Requests
 * **From UX-UI-Designer-Squad, re: TSK-007 — resolved.** Expired/invalid check-in token behavior:
