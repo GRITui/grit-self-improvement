@@ -3,6 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getEffectivePlan, getClientLimit } from "@/lib/billing";
+import type { Coach } from "@/lib/types";
 
 export type ClientFormState = {
   error?: string;
@@ -33,6 +35,28 @@ export async function addClient(
   }
 
   const { supabase, coachId } = await requireCoachId();
+
+  const { data: coach } = await supabase
+    .from("coaches")
+    .select("*")
+    .eq("id", coachId)
+    .single<Coach>();
+
+  if (coach) {
+    const limit = getClientLimit(getEffectivePlan(coach));
+    const { count } = await supabase
+      .from("clients")
+      .select("id", { count: "exact", head: true })
+      .eq("coach_id", coachId)
+      .is("archived_at", null);
+
+    if ((count ?? 0) >= limit) {
+      return {
+        error:
+          "You've reached your plan's client limit. Upgrade your plan to add more clients.",
+      };
+    }
+  }
 
   const { error } = await supabase.from("clients").insert({
     coach_id: coachId,

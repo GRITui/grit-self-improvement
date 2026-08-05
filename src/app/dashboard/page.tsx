@@ -35,18 +35,33 @@ export default async function DashboardPage() {
           </form>
         </div>
 
-        <Link
-          href="/dashboard/clients"
-          className="mt-8 flex items-center justify-between rounded-lg border border-ink-200 bg-white p-6 shadow-sm transition-colors hover:bg-ink-50"
-        >
-          <div>
-            <p className="text-lg font-medium text-ink-800">Clients</p>
-            <p className="mt-1 text-sm text-ink-500">
-              Manage your client roster and invite links.
-            </p>
-          </div>
-          <span className="text-ink-400">&gt;</span>
-        </Link>
+        <div className="mt-8 flex flex-col gap-4">
+          <Link
+            href="/dashboard/clients"
+            className="flex items-center justify-between rounded-lg border border-ink-200 bg-white p-6 shadow-sm transition-colors hover:bg-ink-50"
+          >
+            <div>
+              <p className="text-lg font-medium text-ink-800">Clients</p>
+              <p className="mt-1 text-sm text-ink-500">
+                Manage your client roster and invite links.
+              </p>
+            </div>
+            <span className="text-ink-400">&gt;</span>
+          </Link>
+
+          <Link
+            href="/dashboard/billing"
+            className="flex items-center justify-between rounded-lg border border-ink-200 bg-white p-6 shadow-sm transition-colors hover:bg-ink-50"
+          >
+            <div>
+              <p className="text-lg font-medium text-ink-800">Billing</p>
+              <p className="mt-1 text-sm text-ink-500">
+                View your plan, trial status, and manage your subscription.
+              </p>
+            </div>
+            <span className="text-ink-400">&gt;</span>
+          </Link>
+        </div>
       </div>
     </div>
   );
