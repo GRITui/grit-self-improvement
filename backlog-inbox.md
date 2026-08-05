@@ -411,3 +411,72 @@ Schema: see `PM_CHARTER.md` / `ai-engineering-loop` skill.
   </description>
   <researcher_notes></researcher_notes>
 </task_item>
+
+<task_item>
+  <id>TSK-018</id>
+  <source>OWNER_POPUP</source>
+  <status>NEEDS_OWNER_REVIEW</status>
+  <priority>HIGH</priority>
+  <title>Go-live readiness checklist</title>
+  <description>
+    Owner asked for a go-live checklist (2026-08-05). This is a tracking/reference item, not a
+    single buildable task — PM compiled it from current repo state; splitting individual rows
+    into their own backlog items as they're picked up is expected. Not everything here needs a
+    squad: several rows are owner-only actions (paying for a domain, running a trademark check,
+    creating live Stripe/Supabase projects) that no squad can do from this environment.
+
+    **A. MVP feature gaps (blocks "usable product," Engineer-Squad):**
+    - TSK-008 (AI check-in summarization/risk-flag/draft-reply) — not started. Without it the
+      product's core differentiation wedge (PROJECT_BRIEF.md §7) doesn't exist yet.
+    - TSK-010 (coach dashboard UI) — blocked on TSK-008. Right now a coach has no way to see
+      check-in history at all; TSK-006's roster page is the only client-facing view.
+    - TSK-011 (marketing landing page) — not started. `/` is still the TSK-005 placeholder.
+    - TSK-016 (coach-facing cadence/questions editor) — not started. Every client currently gets
+      the same 3 hardcoded default questions; there's no way for a coach to customize them.
+    - TSK-017 (stale "Powered by GritDesk" string) — trivial, tracked separately.
+
+    **B. Infrastructure/credentials (owner action — no squad can do this):**
+    - Create a real (non-placeholder) Supabase project; run all 5 migrations against it
+      (`supabase/migrations/`); set `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`,
+      `SUPABASE_SERVICE_ROLE_KEY` for real. Every PR so far has been build/lint-verified only,
+      never run against a live database — first real deploy should get a full manual smoke test
+      of signup, client add, check-in submit, and billing before being called done.
+    - Enable Google OAuth provider in Supabase + register a Google Cloud OAuth client; set the
+      authorized redirect URI to `<production-url>/auth/callback`.
+    - Create 3 real Stripe recurring Prices (Starter/Pro/Studio) and a live webhook endpoint per
+      `supabase/README.md`; set `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`,
+      `STRIPE_PRICE_STARTER/PRO/STUDIO`. TSK-014 (QA billing pass) should run against this before
+      real customers touch it.
+    - Buy/point a production domain; set `NEXT_PUBLIC_SITE_URL` to it (currently
+      `http://localhost:3000` default — OAuth and Stripe redirect URLs both depend on this being
+      correct).
+    - Deploy to Vercel (MCP tooling already available in this workspace) or chosen host; wire env
+      vars there, not just locally.
+    - Set up CI (lint + build on every PR) — every PR reviewed so far has been manually verified
+      by re-running `npm run lint`/`npm run build` locally during PM review; there's no automated
+      gate yet, which doesn't scale as PR volume grows.
+
+    **C. Legal/compliance (owner action, likely needs non-squad help — nothing in progress):**
+    - Terms of Service and Privacy Policy — the product stores client PII (name, email,
+      free-text check-in answers) with no policy pages or consent flow anywhere in the app yet.
+    - Real trademark/domain check on "FollowThru" before public launch — TSK-001's screening was
+      web search only, not authoritative (see PROJECT_BRIEF.md §8).
+    - Stripe account activation for live payments (business details, bank account) — separate
+      from the API-key setup in section B.
+
+    **D. Security/hardening worth a look before real traffic (Engineer/QA-Squad):**
+    - No rate limiting on the public, unauthenticated `/checkin/[token]` submit endpoint —
+      low risk today (scoped to one client's token, per TSK-007's PM review) but worth adding
+      before this is publicly linked at scale.
+    - `submit_checkin`'s `answers` jsonb has no size/shape validation (noted in TSK-007's
+      pm_notes) — a client could submit an oversized payload.
+    - No error monitoring/alerting (e.g. Sentry) wired in anywhere — right now a production
+      crash would be silent until a coach reports it.
+
+    **E. Already done, for reference:** coach auth (TSK-005), client roster + invite links
+    (TSK-006), public check-in flow (TSK-007), Stripe billing + plan gating (TSK-009), rebrand
+    (TSK-015), design tokens/wireframes (TSK-003/004), market validation + GTM plan
+    (TSK-001/002).
+  </description>
+  <researcher_notes></researcher_notes>
+</task_item>
