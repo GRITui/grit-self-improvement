@@ -405,7 +405,7 @@ Schema: see `PM_CHARTER.md` / `ai-engineering-loop` skill.
 <task_item>
   <id>TSK-013</id>
   <source>OWNER_POPUP</source>
-  <status>READY_FOR_PM</status>
+  <status>DONE</status>
   <priority>MEDIUM</priority>
   <title>QA pass: check-in flow & AI summarization</title>
   <description>
@@ -413,6 +413,15 @@ Schema: see `PM_CHARTER.md` / `ai-engineering-loop` skill.
     no auth, and that AI summary/risk-flag/draft-reply are generated and never auto-sent.
   </description>
   <researcher_notes></researcher_notes>
+  <pm_notes>
+    2026-08-06: QA-Tester-Squad passed all three items — public check-in page requires no auth,
+    AI summary/risk-flag/draft-reply generated and persisted correctly (claude-opus-5, structured
+    output, stop_reason checked), and confirmed no code path anywhere auto-sends the draft reply
+    (repo-wide search found zero email/SMS integrations; "Save reply" is a DB-only write requiring
+    an authenticated coach). Code-level review only (no live Supabase/Anthropic credentials
+    available) — full findings in squad-handshake/qa-tester-squad.md. One non-blocking naming nit
+    noted (reply_sent_at records a save, not a send; UI copy is correct regardless). Marking DONE.
+  </pm_notes>
 </task_item>
 
 <task_item>
