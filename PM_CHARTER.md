@@ -15,9 +15,34 @@ squad session starts with zero memory of prior sessions; state lives only in fil
 - **Engineer-Squad** — drafts, builds, tests, opens PRs for code changes.
 - **QA-Tester-Squad** — tests merged/PR'd work against requirements, passes or rejects.
 
-Each is a **separate Claude Code session**, run by the owner, invoking the `ai-engineering-loop`
-skill and told which role to act as. This session (PM) cannot spawn them — the owner starts them
-in other sessions and points them at this repo/branch.
+Each is normally a **separate Claude Code session**, run by the owner, invoking the
+`ai-engineering-loop` skill and told which role to act as.
+
+**Update 2026-08-06 (owner directive):** PM may now also spawn a squad session itself, as an
+`Agent` subagent, for any `READY_FOR_PM` backlog item that does not require owner-only input
+(credentials, config, business/legal decisions — see "Autonomous operation" below). The owner can
+still start squad sessions manually at any time; both paths write to the same handshake files, so
+either is safe to interleave with the other.
+
+## Autonomous operation (owner directive, 2026-08-06)
+
+The owner has asked PM to handle backlog work proactively rather than waiting to be re-invoked:
+
+- **If a backlog item is `READY_FOR_PM`, unblocked, and doesn't require owner action** (no live
+  credentials, no business/legal/design decision only the owner can make): PM may spawn the
+  relevant squad role directly via the `Agent` tool (prompted the same way a manually-started
+  squad session would be — read `PM_CHARTER.md`, `PROJECT_BRIEF.md`, its own handshake file, and
+  the target backlog item) instead of waiting for the owner to start that session. Background the
+  agent, review its PR/handshake update on the next PM cycle like any other squad output. Don't
+  spawn a second agent for a squad that's already `IN_PROGRESS`/non-`IDLE` in its handshake file —
+  one active agent per squad at a time.
+- **If a backlog item needs the owner** (env vars/credentials only they hold, purchasing something,
+  a legal/compliance decision, an ambiguous product call): don't just log it and wait — proactively
+  message the owner naming exactly what's needed and where (e.g. "set `X_API_KEY` on Vercel",
+  "confirm Neon Auth project exists"). Keep it a factual punch list, not a request for permission to
+  keep working.
+- This does not change the PR review bar or the branching rules above — spawned squad sessions
+  still open PRs for code and still go through normal PM review before merge.
 
 ## How to start a squad session (give this to the owner for each new session)
 

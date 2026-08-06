@@ -532,36 +532,30 @@ Schema: see `PM_CHARTER.md` / `ai-engineering-loop` skill.
     squad: several rows are owner-only actions (paying for a domain, running a trademark check,
     creating live Stripe/Supabase projects) that no squad can do from this environment.
 
-    **A. MVP feature gaps (blocks "usable product," Engineer-Squad):**
-    - TSK-008 (AI check-in summarization/risk-flag/draft-reply) — not started. Without it the
-      product's core differentiation wedge (PROJECT_BRIEF.md §7) doesn't exist yet.
-    - TSK-010 (coach dashboard UI) — blocked on TSK-008. Right now a coach has no way to see
-      check-in history at all; TSK-006's roster page is the only client-facing view.
-    - TSK-011 (marketing landing page) — not started. `/` is still the TSK-005 placeholder.
-    - TSK-016 (coach-facing cadence/questions editor) — not started. Every client currently gets
-      the same 3 hardcoded default questions; there's no way for a coach to customize them.
-    - TSK-017 (stale "Powered by GritDesk" string) — trivial, tracked separately.
+    **Update 2026-08-06 (PM):** Section A is now fully done — see E. The bigger open item is now
+    the TSK-019 Neon migration epic (TSK-020–024), which supersedes most of section B below (this
+    app no longer targets Supabase once that epic lands). Sections B/C are rewritten to reflect
+    that; D is unchanged.
+
+    **A. MVP feature gaps — DONE.** TSK-008, TSK-010, TSK-011, TSK-016, TSK-017 all shipped.
 
     **B. Infrastructure/credentials (owner action — no squad can do this):**
-    - Create a real (non-placeholder) Supabase project; run all 5 migrations against it
-      (`supabase/migrations/`); set `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`,
-      `SUPABASE_SERVICE_ROLE_KEY` for real. Every PR so far has been build/lint-verified only,
-      never run against a live database — first real deploy should get a full manual smoke test
-      of signup, client add, check-in submit, and billing before being called done.
-    - Enable Google OAuth provider in Supabase + register a Google Cloud OAuth client; set the
-      authorized redirect URI to `<production-url>/auth/callback`.
+    - Neon: confirm a Neon project + database exists (owner said "wired to Neon DB" 2026-08-05)
+      and, once TSK-020 (Neon Auth) lands, create the Neon Auth project too — Engineer-Squad can
+      write the integration code against docs without live credentials (same pattern as every
+      other PR so far), but nothing can be *verified* end-to-end without them.
+    - Once TSK-019's epic lands: set whatever env vars it ends up needing on Vercel (replaces
+      `NEXT_PUBLIC_SUPABASE_*`/`SUPABASE_SERVICE_ROLE_KEY` — exact names depend on TSK-020/021's
+      implementation, see TSK-024).
     - Create 3 real Stripe recurring Prices (Starter/Pro/Studio) and a live webhook endpoint per
       `supabase/README.md`; set `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`,
-      `STRIPE_PRICE_STARTER/PRO/STUDIO`. TSK-014 (QA billing pass) should run against this before
-      real customers touch it.
-    - Buy/point a production domain; set `NEXT_PUBLIC_SITE_URL` to it (currently
-      `http://localhost:3000` default — OAuth and Stripe redirect URLs both depend on this being
-      correct).
-    - Deploy to Vercel (MCP tooling already available in this workspace) or chosen host; wire env
-      vars there, not just locally.
-    - Set up CI (lint + build on every PR) — every PR reviewed so far has been manually verified
-      by re-running `npm run lint`/`npm run build` locally during PM review; there's no automated
-      gate yet, which doesn't scale as PR volume grows.
+      `STRIPE_PRICE_STARTER/PRO/STUDIO`. TSK-014 (QA billing pass, still not run — see backlog)
+      should run against this before real customers touch it.
+    - Buy/point a production domain; set `NEXT_PUBLIC_SITE_URL` to it. The app is already live at
+      the Vercel-assigned domain (owner confirmed prod is deployed) — this is about the real
+      domain, not first deployment.
+    - Set up CI (lint + build on every PR) — every PR is still only manually verified by PM
+      re-running `npm run lint`/`npm run build` locally during review; no automated gate yet.
 
     **C. Legal/compliance (owner action, likely needs non-squad help — nothing in progress):**
     - Terms of Service and Privacy Policy — the product stores client PII (name, email,
@@ -581,9 +575,13 @@ Schema: see `PM_CHARTER.md` / `ai-engineering-loop` skill.
       crash would be silent until a coach reports it.
 
     **E. Already done, for reference:** coach auth (TSK-005), client roster + invite links
-    (TSK-006), public check-in flow (TSK-007), Stripe billing + plan gating (TSK-009), rebrand
-    (TSK-015), design tokens/wireframes (TSK-003/004), market validation + GTM plan
-    (TSK-001/002).
+    (TSK-006), public check-in flow (TSK-007), AI summarization (TSK-008), coach dashboard
+    (TSK-010), Stripe billing + plan gating (TSK-009), marketing landing page (TSK-011),
+    cadence/questions editor (TSK-016), rebrand (TSK-015/017), design tokens/wireframes
+    (TSK-003/004), market validation + GTM plan (TSK-001/002).
+
+    **Still not started, no owner input needed:** TSK-012/013/014 (QA passes — QA-Tester-Squad
+    hasn't run since its first cycle despite TSK-012/014 being unblocked for a while).
   </description>
   <researcher_notes></researcher_notes>
 </task_item>
