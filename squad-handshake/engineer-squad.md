@@ -6,6 +6,15 @@
 </squad_metadata>
 
 ## Current Focus
+**2026-08-06 check-in: confirmed PR #11 still blocked, no change.** Re-checked PR #11's Vercel
+status directly — still `failure`, same root cause (missing Stack Auth env vars on Vercel), as of
+04:54 UTC. TSK-021 explicitly depends on TSK-020 landing (needs the new auth's actual user-ID
+shape), and TSK-020 isn't merged yet — building TSK-021 against an unmerged, potentially-changing
+PR #11 branch would be premature and risks duplicate/conflicting work with whichever session owns
+that PR. Since the blocker is an owner action (Vercel env vars), not something more engineering
+work resolves, going idle rather than forcing a pickup. Will re-check on the next scheduled
+check-in for either PR #11 merging or the block clearing.
+
 **2026-08-06: TSK-020 done, PR #11 open for PM review.** Replaced Supabase Auth (email/password +
 Google OAuth, `@supabase/ssr` session cookies, `src/proxy.ts`/`src/lib/supabase/middleware.ts`) with
 Neon Auth (Stack Auth SDK), per TSK-019's default recommendation. This squad session was spawned
