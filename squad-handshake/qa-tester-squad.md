@@ -1,8 +1,8 @@
 <squad_metadata>
   <squad_name>QA-Tester-Squad</squad_name>
-  <current_status>IN_PROGRESS</current_status>
-  <active_task_id>TSK-013</active_task_id>
-  <sprint_completion_percentage>90</sprint_completion_percentage>
+  <current_status>IDLE</current_status>
+  <active_task_id></active_task_id>
+  <sprint_completion_percentage>95</sprint_completion_percentage>
 </squad_metadata>
 
 ## Current Focus
@@ -118,13 +118,162 @@ No bugs found in this item.
 | 2 | Public check-in page reachable with no client login | PASS |
 | 2 | Client CRUD authorization (coach can't see/edit others' clients) | PASS |
 
+---
+
+## TSK-013 — QA pass: check-in flow & AI summarization (2026-08-06)
+
+**Result: PASS on all three items. No bugs found. No blockers filed.**
+
+**Methodology note — this is a code-level review, not a live runtime test**, for the same
+reason as TSK-012: no Supabase database and no Anthropic/Claude API credentials are available
+in this sandboxed environment, so the public check-in page could not actually be submitted
+end-to-end and the AI analysis call was never actually fired against the live API. Everything
+below is read-through-the-actual-implementation verification — does the described behavior
+exist in code, is it wired together correctly, is there any code path that would violate the
+"never auto-sent" requirement. This is lower-confidence than a real runtime pass; flag for
+re-verification once live credentials are available, same caveat as every prior squad's
+runtime-unverifiable work in this repo.
+
+**Scope check:** confirmed on `main` (commit f79ad2e at pull time, `git pull` reported already
+up to date) that TSK-007 (public check-in flow) and TSK-008 (AI analysis) are merged, and that
+PR #10 (coach "Save reply" UI) is merged and its code is present on `main`. PR #11 (Neon Auth
+migration) is open/unmerged — not opened, reviewed, or commented on; out of scope per PM
+instruction, and irrelevant here since it doesn't touch the check-in or AI-analysis code paths.
+
+### Item 1 — Public check-in page works with no auth: PASS
+
+- `src/app/checkin/[token]/page.tsx` lives outside `/dashboard`, so `src/proxy.ts`'s auth
+  middleware (see TSK-012's Item 1 findings) never runs against it, and the page itself never
+  calls `supabase.auth.getUser()` or checks for a session — it resolves the client purely via
+  the URL token.
+- Token resolution goes through `get_client_by_invite_token(token)`
+  (`supabase/migrations/00000000000003_checkins.sql`), a `SECURITY DEFINER` Postgres function
+  explicitly `grant execute ... to anon, authenticated`. The migration's own header comment
+  states the design intent directly: "All writes/reads for anonymous visitors go through
+  SECURITY DEFINER functions rather than broadening RLS on `clients`/`checkins`, so an
+  anonymous caller can only ever act on the one client whose exact (128-bit random)
+  invite_token they hold."
+- Submission goes through `submit_checkin(token, answers)`, same file, also `SECURITY DEFINER`
+  and granted to `anon`. The `checkins` table's RLS has **no** insert/update/delete policy for
+  `anon` or `authenticated` — the migration comment confirms this is deliberate ("RLS default-
+  denies direct writes"), so the only way to create a check-in row at all is through this
+  function, which itself re-validates the token and `archived_at is null` server-side before
+  inserting. An inactive/deactivated client's link correctly stops working (`page.tsx` renders
+  a "no longer active" message when `client.is_active` is false).
+- Net effect: a client can reach, read, and submit the check-in page with literally zero
+  Supabase session/cookie — genuinely no-auth, not just no-UI-prompt-for-auth.
+
+No bugs found in this item.
+
+### Item 2 — AI summary/risk-flag/draft-reply are generated and persisted: PASS
+
+- `src/app/checkin/[token]/actions.ts` `submitCheckin()` calls `submit_checkin` first (saving
+  the raw answers unconditionally), then — in a separate `try/catch` — calls
+  `analyzeCheckin(questions, answerTexts)` from `src/lib/anthropic.ts` and writes the result
+  (`ai_summary`, `risk_level`, `draft_reply`, `ai_processed_at`) via the service-role admin
+  client (`createAdminClient()`), since the anonymous submitter has no direct UPDATE grant on
+  `checkins` (confirmed against the RLS state described in Item 1). A failed AI call is caught,
+  logged, and does not block or fail the check-in submission itself — matches the code's own
+  comment and is a reasonable design (a missing AI summary on one check-in shouldn't be a
+  submission-blocking failure for the client).
+- `analyzeCheckin()` calls the Anthropic SDK with `model: "claude-opus-5"` — verified this is a
+  real, current, valid model ID (not a typo/hallucinated string). It uses
+  `output_config: {effort: "medium", format: {type: "json_schema", schema: CHECKIN_ANALYSIS_SCHEMA}}`
+  — verified this is a real, documented structured-outputs SDK feature, correctly shaped
+  (`additionalProperties: false` + `required`, as the schema format requires). The schema
+  requests exactly the three fields the task calls for: `summary`, `risk` (enum
+  `LOW`/`MEDIUM`/`HIGH`), `draft_reply`.
+- Response handling checks `response.stop_reason` for `"refusal"` and `"max_tokens"` before
+  reading `response.content` — this matches documented Claude Opus 5 behavior exactly (Opus 5's
+  safety classifiers can decline with `stop_reason: "refusal"`, HTTP 200; a request that
+  exhausts its token budget mid-thought returns `"max_tokens"`). Both are turned into thrown
+  errors, which the caller in `actions.ts` catches and logs rather than crashing the check-in
+  submission — consistent, fail-safe error handling.
+- Text block extraction (`response.content.find(b => b.type === "text")`) then
+  `JSON.parse(textBlock.text)` is the correct pattern for reading a structured-output response.
+- **Minor QA note, not a bug:** the code's own comment explains it bumped `max_tokens` from
+  1024 to 8192 specifically because "On Opus 5, thinking defaults to adaptive-on and shares
+  this budget with the response text" — this shows the implementer already accounted for Opus
+  5's documented breaking change (thinking-on-by-default consuming the same `max_tokens` pool
+  as the visible output), which is the correct fix per Anthropic's own migration guidance. There
+  is still a theoretical residual risk that an unusually long/complex check-in could exhaust
+  8192 tokens on thinking + JSON output and hit `stop_reason: "max_tokens"` — but the code
+  already treats that as a caught, logged, non-fatal error rather than crashing or silently
+  losing data, so this is a "worth watching in production metrics" note, not a blocker.
+- Confirmed via `npx tsc --noEmit`: no type errors anywhere in `src/lib/anthropic.ts` or
+  `src/app/checkin/[token]/*` (the only type errors in the project are pre-existing, unrelated
+  ones — missing `@supabase/ssr` type declarations because that package isn't installed in this
+  sandbox, and some implicit-`any` params in unrelated dashboard files — none touch the AI
+  analysis or check-in submission code paths).
+
+No bugs found in this item.
+
+### Item 3 — Draft reply is never auto-sent: PASS
+
+This is the hard requirement per PM_CHARTER.md/PROJECT_BRIEF.md (Section 8: "AI summarization
+quality/liability: coach must review before sending, never auto-send"), so this item got the
+most scrutiny.
+
+- Repo-wide search (`grep -rn` across `src/`, plus `package.json` dependencies) for any
+  email/SMS-send integration — `resend`, `nodemailer`, `sendgrid`, `twilio`, `sendMail`,
+  `smtp`, etc. — found **zero matches**. The only API route under `src/app/api/` is
+  `webhooks/stripe/route.ts` (billing, unrelated to check-ins). There is no dependency in
+  `package.json` for any transactional-email or SMS provider. **There is no outbound-delivery
+  code path anywhere in this codebase that could fire automatically** — confirming PR #10's own
+  stated design (deliberately not sending automatically, since no such integration exists) is
+  still true on `main` today.
+- The only code that writes a coach's reply is `saveCoachReply()`
+  (`src/app/dashboard/clients/[id]/actions.ts`): it requires an authenticated coach session
+  (`supabase.auth.getUser()`, redirects to `/login` if absent — so this can only be triggered by
+  a logged-in coach, never by the anonymous check-in submission or by the AI analysis
+  completing), and its only side effect is `supabase.from("checkins").update({coach_reply,
+  reply_sent_at})` — a database write, not a send. There is no cron job, webhook, database
+  trigger, or Postgres function anywhere in `supabase/migrations/` that could invoke this or any
+  send-like action automatically.
+- The coach dashboard UI (`src/components/dashboard/checkin-card.tsx`) pre-fills the reply
+  textarea from `checkin.coach_reply ?? checkin.draft_reply` (so the AI draft is a starting
+  point, editable before any persistence), and the submit button is explicitly labeled
+  **"Save reply"** (not "Send"), with a caption directly under it: *"Saved here for your
+  records — send it to your client through your usual channel (email, text, etc)."* This is
+  correct, honest UI copy — it does not imply sending happens, and nothing in the code path
+  contradicts that copy.
+- **Minor naming nit, not a functional bug:** the DB column is named `reply_sent_at`, which
+  reads as if it tracks a send event. In practice it's set to `new Date().toISOString()` on
+  every save (not send), and the UI correctly labels its rendering "Last saved" rather than
+  "Last sent" (`checkin-card.tsx` line 136), so no user-facing surface is misleading — only the
+  column name itself is arguably mis-named for what it actually records. Worth a rename in a
+  future cleanup task, but it has no functional or product-facing impact today, so not filing
+  it as a blocker.
+- No AI-analysis code path (`src/lib/anthropic.ts`, `src/app/checkin/[token]/actions.ts`) writes
+  to `coach_reply` or `reply_sent_at` — only `draft_reply` (the AI's suggestion) is written by
+  the automated analysis; only a coach's own authenticated `saveCoachReply()` call can touch
+  `coach_reply`/`reply_sent_at`, and even that is a save, never a send.
+
+No bugs found in this item. The "never auto-sent" requirement holds on `main`.
+
+### TSK-013 Result summary
+
+| Item | Behavior | Result |
+|---|---|---|
+| 1 | Public check-in page reachable and submittable with zero auth/session | PASS |
+| 1 | Anonymous writes scoped to the one client via `SECURITY DEFINER` + token, not broadened RLS | PASS |
+| 2 | AI summary generated via valid model (`claude-opus-5`) + real structured-outputs feature | PASS |
+| 2 | Risk flag (LOW/MEDIUM/HIGH) and draft reply generated and persisted to `checkins` | PASS |
+| 2 | AI failure is caught/logged, never blocks or corrupts the check-in submission | PASS |
+| 3 | No email/SMS/outbound-delivery integration exists anywhere in the codebase | PASS |
+| 3 | Coach "Save reply" writes to DB only, requires authenticated session, is never auto-triggered | PASS |
+| 3 | UI copy accurately describes save-not-send behavior | PASS |
+
+---
+
 ## Recent Commits / PRs
 * This handshake update (direct commit to `main`, coordination file per PM_CHARTER — no PR
   needed, no app code touched).
 
 ## Blockers & QA Failures
-(none — TSK-012 passed code-level review on both items; see Current Focus above for the
-caveat that this is not yet runtime-verified against a live Supabase instance)
+(none — TSK-012 passed code-level review on both items; TSK-013 passed code-level review on all
+three items, including the "never auto-send" hard requirement; see each task's section above for
+the caveat that neither pass is yet runtime-verified against a live Supabase/Anthropic setup)
 
 ## Cross-Squad Requests
 (none)
