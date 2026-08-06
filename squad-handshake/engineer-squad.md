@@ -1,11 +1,17 @@
 <squad_metadata>
   <squad_name>Engineer-Squad</squad_name>
-  <current_status>IDLE</current_status>
-  <active_task_id></active_task_id>
-  <sprint_completion_percentage>100</sprint_completion_percentage>
+  <current_status>IN_PROGRESS</current_status>
+  <active_task_id>TSK-020</active_task_id>
+  <sprint_completion_percentage>90</sprint_completion_percentage>
 </squad_metadata>
 
 ## Current Focus
+**2026-08-06: PM spawned this squad autonomously (Agent subagent) to start TSK-020** (Neon-compatible
+auth replacement), per new owner directive to proactively drive non-owner-blocked backlog forward
+without waiting for a manually-started session. If you're a manually-started Engineer-Squad session
+reading this and `active_task_id` still says TSK-020, check for an open PR/recent commits before
+also picking it up — avoid duplicate work.
+
 PR #10 (TSK-010, coach dashboard UI) is merged — the owner merged it directly on GitHub
 (merge commit 4588e0b) rather than through the usual squad-PR-to-PM-review flow. PM did a
 post-hoc review same-day: no issues found, correctly follows the established RLS-scoped-write
