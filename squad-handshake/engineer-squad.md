@@ -29,6 +29,12 @@ through TSK-024) if another squad session picks this repo up next.
   like the earlier missing-Supabase-env-var incident. The owner needs a Neon Auth (or standalone
   Stack Auth) project set up and those three vars on Vercel before this merges, or the deploy fails
   outright. Full setup steps are in the rewritten `supabase/README.md` §1.
+  **2026-08-06, PM confirmed via Vercel build logs:** this predicted failure is exactly what
+  happened — PR #11's Vercel preview build fails at `src/lib/auth/stack.ts:15` with Stack Auth's
+  own "you haven't provided a project ID" error, nothing else wrong. PM commented on the PR and
+  pushed this to the owner directly as an action item. **Do not merge until the preview build is
+  green** — merging now would break the *production* build (main auto-deploys), not just fail a
+  preview.
 - **I fixed the RLS-authorization gap this auth swap creates, rather than leaving it for TSK-021.**
   `coaches`/`clients`/`checkins` still live in Supabase Postgres (TSK-021 moves them to Neon), and
   Supabase RLS gates everything on `auth.uid()` — a claim only Supabase's own auth issues. The
@@ -106,7 +112,9 @@ forward.
   `auth.users` trigger/FK. Rewrites `supabase/README.md` and `.env.example`. `npm run lint`/
   `npm run build` verified (build needs placeholder env vars locally, same as any prior PR here with
   no live credentials — see PR description for the deploy-ordering note before merge). Status:
-  **open, awaiting PM review**.
+  **open, blocked on owner** — Vercel preview build fails (confirmed via build logs, 2026-08-06)
+  exactly as the PR predicted: missing Stack Auth env vars on Vercel. PM commented on the PR;
+  code review otherwise looks correct on a read-through, will finish once it deploys clean.
 * PR #10: https://github.com/GRITui/grit-self-improvement/pull/10 — TSK-010 coach dashboard UI:
   /dashboard is now the risk-sorted client list (streak/last-check-in/risk badge),
   /dashboard/clients/[id] is the drill-in (check-in history, AI summary, editable reply seeded
