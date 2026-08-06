@@ -1,39 +1,34 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { requireCoachId } from "@/lib/auth/session";
+import { createDataClient } from "@/lib/supabase/data";
 import { getStripe } from "@/lib/stripe";
 import { PLAN_TIERS, type PlanTier } from "@/lib/billing";
 import type { Coach } from "@/lib/types";
 
 async function requireCoach() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/login");
-  }
+  const coachId = await requireCoachId();
+  const supabase = createDataClient();
 
   const { data: coach } = await supabase
     .from("coaches")
     .select("*")
-    .eq("id", user.id)
+    .eq("id", coachId)
     .single<Coach>();
 
   if (!coach) {
     redirect("/login");
   }
 
-  return { supabase, user, coach };
+  return { supabase, coachId, coach };
 }
 
 export async function startCheckout(planId: PlanTier["id"]) {
   const tier = PLAN_TIERS.find((t) => t.id === planId);
   if (!tier) return;
 
-  const { supabase, user, coach } = await requireCoach();
+  const { supabase, coachId, coach } = await requireCoach();
   const stripe = getStripe();
   const origin = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
   const priceId = process.env[tier.priceEnvVar];
@@ -49,14 +44,14 @@ export async function startCheckout(planId: PlanTier["id"]) {
   let customerId = coach.stripe_customer_id;
   if (!customerId) {
     const customer = await stripe.customers.create({
-      email: user.email,
-      metadata: { coach_id: user.id },
+      email: coach.email,
+      metadata: { coach_id: coachId },
     });
     customerId = customer.id;
     await supabase
       .from("coaches")
       .update({ stripe_customer_id: customerId })
-      .eq("id", user.id);
+      .eq("id", coachId);
   }
 
   const session = await stripe.checkout.sessions.create({
@@ -65,7 +60,7 @@ export async function startCheckout(planId: PlanTier["id"]) {
     line_items: [{ price: priceId, quantity: 1 }],
     success_url: `${origin}/dashboard/billing?success=true`,
     cancel_url: `${origin}/dashboard/billing`,
-    metadata: { coach_id: user.id },
+    metadata: { coach_id: coachId },
   });
 
   if (session.url) {

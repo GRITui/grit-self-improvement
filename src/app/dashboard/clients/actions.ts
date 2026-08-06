@@ -1,8 +1,8 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { requireCoachId as requireCoachIdFromSession } from "@/lib/auth/session";
+import { createDataClient } from "@/lib/supabase/data";
 import { getEffectivePlan, getClientLimit } from "@/lib/billing";
 import type { Coach } from "@/lib/types";
 
@@ -11,16 +11,8 @@ export type ClientFormState = {
 };
 
 async function requireCoachId() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/login");
-  }
-
-  return { supabase, coachId: user.id };
+  const coachId = await requireCoachIdFromSession();
+  return { supabase: createDataClient(), coachId };
 }
 
 export async function addClient(
@@ -84,12 +76,18 @@ export async function updateClient(
     return { error: "Client name is required." };
   }
 
-  const { supabase } = await requireCoachId();
+  const { supabase, coachId } = await requireCoachId();
 
+  // Explicit coach_id filter -- Supabase RLS (auth.uid() = coach_id) used
+  // to be the only thing stopping a coach from updating another coach's
+  // client here; that no longer authenticates anything now that sessions
+  // are Neon Auth sessions, so this filter is now the actual enforcement.
+  // See src/lib/supabase/data.ts.
   const { error } = await supabase
     .from("clients")
     .update({ name, email: email || null })
-    .eq("id", id);
+    .eq("id", id)
+    .eq("coach_id", coachId);
 
   if (error) {
     return { error: error.message };
@@ -125,12 +123,13 @@ export async function updateProgram(
     return { error: "Choose between 1 and 5 questions." };
   }
 
-  const { supabase } = await requireCoachId();
+  const { supabase, coachId } = await requireCoachId();
 
   const { error } = await supabase
     .from("clients")
     .update({ cadence, questions })
-    .eq("id", id);
+    .eq("id", id)
+    .eq("coach_id", coachId);
 
   if (error) {
     return { error: error.message };
@@ -144,12 +143,13 @@ export async function removeClient(formData: FormData) {
   const id = String(formData.get("id") ?? "");
   if (!id) return;
 
-  const { supabase } = await requireCoachId();
+  const { supabase, coachId } = await requireCoachId();
 
   await supabase
     .from("clients")
     .update({ archived_at: new Date().toISOString() })
-    .eq("id", id);
+    .eq("id", id)
+    .eq("coach_id", coachId);
 
   revalidatePath("/dashboard/clients");
 }

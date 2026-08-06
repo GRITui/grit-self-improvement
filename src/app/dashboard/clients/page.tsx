@@ -1,23 +1,23 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { stackServerApp } from "@/lib/auth/stack";
+import { createDataClient } from "@/lib/supabase/data";
 import { AddClientForm } from "@/components/clients/add-client-form";
 import { ClientRow } from "@/components/clients/client-row";
 import type { Client } from "@/lib/types";
 
 export default async function ClientsPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await stackServerApp.getUser();
 
   if (!user) {
     redirect("/login");
   }
 
+  const supabase = createDataClient();
   const { data: clients, error } = await supabase
     .from("clients")
     .select("*")
+    .eq("coach_id", user.id)
     .is("archived_at", null)
     .order("created_at", { ascending: false })
     .returns<Client[]>();

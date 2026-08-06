@@ -1,6 +1,6 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/data";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { analyzeCheckin } from "@/lib/anthropic";
 
@@ -23,7 +23,7 @@ export async function submitCheckin(
     answer: answerTexts[index],
   }));
 
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data: checkinId, error } = await supabase.rpc("submit_checkin", {
     token,
     answers,
