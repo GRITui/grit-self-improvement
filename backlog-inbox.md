@@ -383,7 +383,7 @@ Schema: see `PM_CHARTER.md` / `ai-engineering-loop` skill.
 <task_item>
   <id>TSK-012</id>
   <source>OWNER_POPUP</source>
-  <status>READY_FOR_PM</status>
+  <status>DONE</status>
   <priority>MEDIUM</priority>
   <title>QA pass: auth & client roster</title>
   <description>
@@ -393,6 +393,13 @@ Schema: see `PM_CHARTER.md` / `ai-engineering-loop` skill.
     failures rather than fixing code directly.
   </description>
   <researcher_notes></researcher_notes>
+  <pm_notes>
+    2026-08-06: QA-Tester-Squad passed both items (coach signup/login incl. Google OAuth; client
+    CRUD + invite-link generation) — no bugs found, nothing BLOCKED. Code-level review only (no
+    live Supabase credentials available to click through a real signup/OAuth flow), same
+    established pattern as every other squad's runtime-unverifiable work in this repo — full
+    per-item findings in squad-handshake/qa-tester-squad.md. Marking DONE on that basis.
+  </pm_notes>
 </task_item>
 
 <task_item>
