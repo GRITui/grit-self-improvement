@@ -1,11 +1,18 @@
 <squad_metadata>
   <squad_name>QA-Tester-Squad</squad_name>
-  <current_status>IDLE</current_status>
-  <active_task_id>none</active_task_id>
-  <sprint_completion_percentage>100</sprint_completion_percentage>
+  <current_status>IN_PROGRESS</current_status>
+  <active_task_id>TSK-013</active_task_id>
+  <sprint_completion_percentage>90</sprint_completion_percentage>
 </squad_metadata>
 
 ## Current Focus
+**2026-08-06: PM spawned this squad autonomously (Agent subagent) again to run TSK-013**
+(QA pass: check-in flow & AI summarization) — both its dependencies (TSK-007, TSK-008) are DONE
+so it's now unblocked. If you're a manually-started QA-Tester-Squad session reading this and
+`active_task_id` still says TSK-013, check this file's Recent Commits section for a result before
+also picking it up. TSK-014 (QA: billing & plan gating) is also unblocked and next in line after
+this.
+
 **2026-08-06: TSK-012 (QA pass: auth & client roster) done — result: PASS on both items.**
 
 **Methodology note — this was a code-level review, not a live runtime test.** No Supabase
