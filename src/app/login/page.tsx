@@ -1,24 +1,37 @@
 "use client";
 
-import { Suspense, useActionState } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import { login, type AuthFormState } from "./actions";
+import { useStackApp } from "@stackframe/stack";
 import { GoogleButton } from "@/components/auth/google-button";
+import type { AuthFormState } from "@/lib/auth/types";
 
 const initialState: AuthFormState = {};
 
-function OAuthError() {
-  const searchParams = useSearchParams();
-  const oauthError = searchParams.get("error");
-  if (!oauthError) return null;
-  return (
-    <p className="text-sm text-red-600 dark:text-red-400">{oauthError}</p>
-  );
-}
-
 export default function LoginPage() {
-  const [state, formAction, pending] = useActionState(login, initialState);
+  const app = useStackApp();
+  const [state, setState] = useState<AuthFormState>(initialState);
+  const [pending, setPending] = useState(false);
+
+  async function handleSubmit(formData: FormData) {
+    setPending(true);
+    setState({});
+
+    const email = String(formData.get("email") ?? "");
+    const password = String(formData.get("password") ?? "");
+
+    try {
+      // On success, signInWithCredential navigates to urls.afterSignIn
+      // (see src/lib/auth/stack.ts) itself -- no manual redirect needed
+      // here, matching Stack Auth's own built-in sign-in component.
+      const result = await app.signInWithCredential({ email, password });
+      if (result.status === "error") {
+        setState({ error: result.error.message });
+      }
+    } finally {
+      setPending(false);
+    }
+  }
 
   return (
     <div className="flex flex-1 items-center justify-center bg-zinc-50 px-6 dark:bg-black">
@@ -40,7 +53,7 @@ export default function LoginPage() {
           <div className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800" />
         </div>
 
-        <form action={formAction} className="space-y-4">
+        <form action={handleSubmit} className="space-y-4">
           <div>
             <label
               htmlFor="email"
@@ -79,9 +92,6 @@ export default function LoginPage() {
               {state.error}
             </p>
           )}
-          <Suspense fallback={null}>
-            <OAuthError />
-          </Suspense>
 
           <button
             type="submit"

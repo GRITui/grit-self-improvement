@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { stackServerApp } from "@/lib/auth/stack";
+import { createDataClient } from "@/lib/supabase/data";
 import { PLAN_TIERS, getEffectivePlan, getClientLimit } from "@/lib/billing";
 import { startCheckout, openBillingPortal } from "./actions";
 import type { Coach } from "@/lib/types";
@@ -11,15 +12,13 @@ export default async function BillingPage({
   searchParams: Promise<{ success?: string; error?: string }>;
 }) {
   const { success, error } = await searchParams;
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await stackServerApp.getUser();
 
   if (!user) {
     redirect("/login");
   }
 
+  const supabase = createDataClient();
   const { data: coach } = await supabase
     .from("coaches")
     .select("*")

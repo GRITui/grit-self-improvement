@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
-import { signOut } from "@/lib/supabase/actions";
+import { stackServerApp } from "@/lib/auth/stack";
+import { signOut } from "@/lib/auth/actions";
+import { createDataClient } from "@/lib/supabase/data";
 import { computeStreak, daysAgo } from "@/lib/streak";
 import { RiskBadge } from "@/components/dashboard/risk-badge";
 import type { Client } from "@/lib/types";
@@ -17,18 +18,17 @@ type ClientWithCheckins = Client & {
 const RISK_ORDER: Record<string, number> = { HIGH: 0, MEDIUM: 1, LOW: 2 };
 
 export default async function DashboardPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await stackServerApp.getUser();
 
   if (!user) {
     redirect("/login");
   }
 
+  const supabase = createDataClient();
   const { data: clients } = await supabase
     .from("clients")
     .select("*, checkins(id, risk_level, created_at)")
+    .eq("coach_id", user.id)
     .is("archived_at", null)
     .returns<ClientWithCheckins[]>();
 
@@ -66,7 +66,7 @@ export default async function DashboardPage() {
           <div>
             <h1 className="text-2xl font-semibold text-ink-800">Dashboard</h1>
             <p className="mt-1 text-sm text-ink-500">
-              Signed in as {user.email}
+              Signed in as {user.primaryEmail}
             </p>
           </div>
           <div className="flex items-center gap-2">

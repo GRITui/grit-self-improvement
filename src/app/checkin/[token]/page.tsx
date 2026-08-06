@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/data";
 import { CheckinForm } from "./checkin-form";
 import type { PublicCheckinClient } from "@/lib/types";
 
@@ -10,7 +10,7 @@ export default async function CheckinPage({
   params: Promise<{ token: string }>;
 }) {
   const { token } = await params;
-  const supabase = await createClient();
+  const supabase = createPublicClient();
 
   const { data } = await supabase.rpc("get_client_by_invite_token", {
     token,
