@@ -1,16 +1,51 @@
 <squad_metadata>
   <squad_name>Engineer-Squad</squad_name>
-  <current_status>IN_PROGRESS</current_status>
-  <active_task_id>TSK-020</active_task_id>
-  <sprint_completion_percentage>90</sprint_completion_percentage>
+  <current_status>IDLE</current_status>
+  <active_task_id>none</active_task_id>
+  <sprint_completion_percentage>100</sprint_completion_percentage>
 </squad_metadata>
 
 ## Current Focus
-**2026-08-06: PM spawned this squad autonomously (Agent subagent) to start TSK-020** (Neon-compatible
-auth replacement), per new owner directive to proactively drive non-owner-blocked backlog forward
-without waiting for a manually-started session. If you're a manually-started Engineer-Squad session
-reading this and `active_task_id` still says TSK-020, check for an open PR/recent commits before
-also picking it up — avoid duplicate work.
+**2026-08-06: TSK-020 done, PR #11 open for PM review.** Replaced Supabase Auth (email/password +
+Google OAuth, `@supabase/ssr` session cookies, `src/proxy.ts`/`src/lib/supabase/middleware.ts`) with
+Neon Auth (Stack Auth SDK), per TSK-019's default recommendation. This squad session was spawned
+autonomously by PM per the new owner directive; going IDLE now that the PR is open — see PR #11
+below for full details, and TSK-019/backlog-inbox.md for the epic's remaining sub-tasks (TSK-021
+through TSK-024) if another squad session picks this repo up next.
+
+**Worth flagging for PM review and for whoever picks up TSK-021 next:**
+- **SDK API verified from the installed package's actual `.d.ts` files**, not from training-data
+  recall — I installed `@stackframe/stack` and read `node_modules/@stackframe/stack/dist/**/*.d.ts`
+  directly to confirm method signatures (`signInWithCredential`, `signInWithOAuth`, `getUser`,
+  `StackProvider`, `StackHandler`, the env var names it auto-reads, etc.) before writing app code
+  against them. `npm run build` (with placeholder Stack/Supabase env vars, since no live credentials
+  exist in this environment) confirms the code compiles and type-checks against the real SDK, not
+  just against my assumptions about its shape.
+- **Deploy-ordering risk, needs the owner's attention before merge:** unlike the old Supabase
+  clients (constructed lazily, per-request), `StackServerApp` validates its required env vars
+  *eagerly at module load*, and it's imported by the root layout — in the require path for every
+  page. If `NEXT_PUBLIC_STACK_PROJECT_ID` / `NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY` /
+  `STACK_SECRET_SERVER_KEY` aren't set on Vercel, **the build itself will fail**, not deploy-then-500
+  like the earlier missing-Supabase-env-var incident. The owner needs a Neon Auth (or standalone
+  Stack Auth) project set up and those three vars on Vercel before this merges, or the deploy fails
+  outright. Full setup steps are in the rewritten `supabase/README.md` §1.
+- **I fixed the RLS-authorization gap this auth swap creates, rather than leaving it for TSK-021.**
+  `coaches`/`clients`/`checkins` still live in Supabase Postgres (TSK-021 moves them to Neon), and
+  Supabase RLS gates everything on `auth.uid()` — a claim only Supabase's own auth issues. The
+  moment Supabase Auth is gone, `auth.uid()` is always null under a Neon Auth session, so every
+  RLS-protected read/write would've silently returned nothing. Added `src/lib/supabase/data.ts`
+  (service-role client) with an explicit `coach_id`/ownership filter at every call site that
+  previously relied on RLS alone — more than the two files TSK-021's own description called out
+  (`updateClient`/`updateProgram`/`removeClient`); the dashboard client list, the clients list page,
+  and the check-in reply update were *also* relying on RLS alone with no filter at all. TSK-021 can
+  treat this audit as largely done and focus on the Neon/Drizzle client-library swap itself.
+- Coach row creation moved from the old `on_auth_user_created` Postgres trigger (which fired on
+  Supabase's own `auth.users` table — nothing left to trigger off of once Neon Auth stops writing
+  into this database) to app code: `ensureCoachRow()` in `src/lib/auth/session.ts`, called from the
+  new `src/app/dashboard/layout.tsx` on every authenticated request, idempotent via upsert.
+- `supabase/README.md` rewritten in place (not renamed) as the transitional auth+DB setup doc, since
+  `supabase/migrations/` is still the DB source of truth until TSK-021 lands. Flagged explicitly as
+  transitional in the file itself — TSK-024 replaces it outright once TSK-021-023 are done.
 
 PR #10 (TSK-010, coach dashboard UI) is merged — the owner merged it directly on GitHub
 (merge commit 4588e0b) rather than through the usual squad-PR-to-PM-review flow. PM did a
@@ -61,6 +96,17 @@ auto-rejected. If you rebase onto latest main before opening a PR, this is easy 
 forward.
 
 ## Recent Commits / PRs
+* PR #11: https://github.com/GRITui/grit-self-improvement/pull/11 — TSK-020 Neon Auth migration:
+  replaces Supabase Auth (email/password + Google OAuth + session cookies + `/dashboard/*` route
+  protection) with Neon Auth (Stack Auth SDK). Adds `src/lib/auth/*` (Stack app config, session
+  helpers, sign-out action, middleware), `src/app/handler/[...stack]` (required Stack catch-all
+  route), rewrites login/signup pages + GoogleButton as client components against `useStackApp()`.
+  Adds `src/lib/supabase/data.ts` (service-role client with explicit `coach_id` filters, replacing
+  RLS which can no longer authenticate Neon Auth sessions) and a migration dropping the old
+  `auth.users` trigger/FK. Rewrites `supabase/README.md` and `.env.example`. `npm run lint`/
+  `npm run build` verified (build needs placeholder env vars locally, same as any prior PR here with
+  no live credentials — see PR description for the deploy-ordering note before merge). Status:
+  **open, awaiting PM review**.
 * PR #10: https://github.com/GRITui/grit-self-improvement/pull/10 — TSK-010 coach dashboard UI:
   /dashboard is now the risk-sorted client list (streak/last-check-in/risk badge),
   /dashboard/clients/[id] is the drill-in (check-in history, AI summary, editable reply seeded
