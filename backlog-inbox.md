@@ -427,7 +427,7 @@ Schema: see `PM_CHARTER.md` / `ai-engineering-loop` skill.
 <task_item>
   <id>TSK-014</id>
   <source>OWNER_POPUP</source>
-  <status>READY_FOR_PM</status>
+  <status>DONE</status>
   <priority>LOW</priority>
   <title>QA pass: billing & plan gating</title>
   <description>
@@ -435,6 +435,16 @@ Schema: see `PM_CHARTER.md` / `ai-engineering-loop` skill.
     creation past the cap, and upgrade prompt appears correctly.
   </description>
   <researcher_notes></researcher_notes>
+  <pm_notes>
+    2026-08-07: QA-Tester-Squad passed all three items — trial defaults set correctly at signup
+    (14-day trial, DB column defaults), addClient's tier-limit check is a genuine server-side
+    block (not UI-only) matching PROJECT_BRIEF.md §4's limits exactly, and the upgrade prompt
+    shows correct/honest copy at /dashboard/billing. Code-level review only (no live Stripe/
+    Supabase credentials available) — full findings in squad-handshake/qa-tester-squad.md. One
+    non-blocking UX gap re-confirmed from TSK-009's original review (upgrade CTA is plain text,
+    not a link). No blockers filed. Marking DONE — this closes out QA-Tester-Squad's current
+    sprint (TSK-012/013/014 all DONE).
+  </pm_notes>
 </task_item>
 
 <task_item>
