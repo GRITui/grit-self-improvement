@@ -1,11 +1,18 @@
 <squad_metadata>
   <squad_name>QA-Tester-Squad</squad_name>
-  <current_status>IN_PROGRESS</current_status>
-  <active_task_id>TSK-014</active_task_id>
-  <sprint_completion_percentage>98</sprint_completion_percentage>
+  <current_status>IDLE</current_status>
+  <active_task_id></active_task_id>
+  <sprint_completion_percentage>100</sprint_completion_percentage>
 </squad_metadata>
 
 ## Current Focus
+**2026-08-07: TSK-014 (QA pass: billing & plan gating) done — result: PASS on all three items**
+(trial flow, server-side tier-limit enforcement, upgrade prompt). No blockers filed; one
+non-blocking UX gap noted (upgrade CTA is plain text, no link). See full write-up below. This was
+the last item in this squad's current sprint — TSK-012/013/014 are now all done from QA's side.
+Squad is IDLE, no `active_task_id`, awaiting the next `READY_FOR_PM` item tagged for
+QA-Tester-Squad.
+
 **2026-08-07: PM spawned this squad autonomously (Agent subagent) again to run TSK-014**
 (QA pass: billing & plan gating) — last item in this squad's current sprint (TSK-012/013 both
 already DONE, see below). If you're a manually-started QA-Tester-Squad session reading this and
@@ -272,14 +279,153 @@ No bugs found in this item. The "never auto-sent" requirement holds on `main`.
 
 ---
 
+## TSK-014 — QA pass: billing & plan gating (2026-08-07)
+
+**Result: PASS on all three items. No bugs found. No blockers filed.**
+
+**Methodology note — this is a code-level review, not a live runtime test**, same reason as
+TSK-012/TSK-013: no Stripe or Supabase credentials are available in this sandboxed environment, so
+a real checkout session, webhook round-trip, or trial-expiry click-through could not be performed.
+This is exactly the follow-up Engineer-Squad's own TSK-009 handshake/PR notes called for when they
+flagged billing/gating as "code-reviewed, not runtime-verified" at ship time — everything below is
+independent read-through-the-actual-implementation verification: does the described behavior exist
+in code, is the tier limit actually enforced server-side (not just displayed), does the trial get
+set up correctly at signup. This is lower-confidence than a real runtime pass; flag for
+re-verification once live Stripe/Supabase credentials are available, same caveat as every prior
+squad's runtime-unverifiable work in this repo.
+
+**Scope check:** confirmed on `main` (commit fac1f76 at pull time, `git pull` reported already up
+to date) that TSK-009 (Stripe billing + plan gating) is merged. PR #11 (Neon Auth migration) is
+open/unmerged — not opened, reviewed, or commented on; out of scope per PM instruction, and
+irrelevant here since it doesn't touch billing/gating code paths (billing keys off `coaches.id` /
+`stripe_customer_id`, not the auth provider).
+
+### Item 1 — Trial flow: does a new coach get `trial_ends_at` set correctly: PASS
+
+- `supabase/migrations/00000000000005_billing.sql`: `coaches.plan` defaults to `'trialing'` and
+  `coaches.trial_ends_at` defaults to `now() + interval '14 days'` at the column level — matches
+  PROJECT_BRIEF.md §4's "14-day free trial" exactly.
+- `handle_new_coach()` (`00000000000001_coaches.sql`), the `SECURITY DEFINER` trigger that
+  provisions a coach row on every `auth.users` insert (verified in TSK-012's pass), only inserts
+  `(id, email)` — it never sets `plan`/`trial_ends_at` explicitly, so every new coach, from either
+  signup path, gets the column defaults applied automatically. No app-code path sets these fields
+  at signup time either (confirmed no reference to `trial_ends_at` outside `billing.ts` and the
+  webhook handler) — so there's no way for a coach to be created with a missing or malformed trial
+  window.
+- `getEffectivePlan()` (`src/lib/billing.ts`) derives the *live* trial state from
+  `trial_ends_at > now()` at read time rather than flipping a stored flag via a cron job — the
+  migration's own header comment states this is deliberate ("no scheduled job is needed to flip
+  it"). Verified the comparison direction is correct (`new Date(coach.trial_ends_at) > new Date()`
+  returns `"trialing"`, otherwise `"blocked"`) — an expired trial with no plan chosen correctly
+  falls through to blocked, not silently staying trialing.
+
+No bugs found in this item.
+
+### Item 2 — Tier limits actually block client creation past the cap: PASS
+
+This was the item to scrutinize hardest per the task brief (UI-only warning vs. real server-side
+block), so it got the most attention.
+
+- `addClient()` (`src/app/dashboard/clients/actions.ts`) is a Next.js Server Action (`"use server"`
+  at the top of the file) — it executes on the server, not in the browser, so it cannot be bypassed
+  by disabling JS, editing the DOM, or crafting a request that skips client-side validation. The
+  limit check (`getClientLimit(getEffectivePlan(coach))` compared against a fresh `count` query
+  scoped to `coach_id` + `archived_at is null`) runs, and can return an error that aborts the
+  function, **before** the `supabase.from("clients").insert(...)` call — confirmed this is a real
+  early-return, not a warning that still lets the insert through. This directly answers the
+  concern raised in the task setup: the cap is enforced server-side, not UI-only.
+- Verified the limit numbers themselves match PROJECT_BRIEF.md §4: `PLAN_TIERS` in `billing.ts`
+  sets Starter=10, Pro=30, Studio=`Infinity` (unlimited) — exact match. `TRIAL_CLIENT_LIMIT = 30`
+  for trialing coaches is a deliberate above-spec choice (comment: "generous trial ceiling matches
+  Pro... without being literally unlimited") — not in the brief but a reasonable, documented
+  product decision, not a bug.
+- Verified the `Infinity` case doesn't misbehave: `(count ?? 0) >= Infinity` is always `false` in
+  JS, so a Studio coach is correctly never blocked. Verified the `blocked` case (trial expired,
+  plan `canceled`, no active subscription): `getClientLimit("blocked")` returns `0`, so
+  `count >= 0` is always `true` — a coach in this state is blocked from adding *any* client,
+  including their first, which is correct per the effective-plan model.
+- Cross-checked the webhook handler (`src/app/api/webhooks/stripe/route.ts`) that keeps `plan` in
+  sync with Stripe: signature verification present (`stripe.webhooks.constructEvent`, rejects
+  invalid signatures with 400), `checkout.session.completed` maps the purchased price ID back to a
+  plan tier via `planIdFromPriceId()` and writes it, `customer.subscription.updated`/`.deleted`
+  correctly move a coach to `canceled` on cancellation/non-payment (`status === "canceled" ||
+  "unpaid"`) — so the limit a coach is held to stays accurate as their subscription state changes,
+  not just at initial trial/signup. This uses the service-role admin client since webhook requests
+  carry no coach session for RLS to key off — scoped only to this route, consistent with TSK-009's
+  own documented rationale (already reviewed at merge time, re-confirmed here).
+- **Pre-existing non-blocking notes (already on record from TSK-009's own PM review, re-confirmed
+  independently here, not new findings):** the plan-limit check has a small TOCTOU race under
+  concurrent add-client requests (two simultaneous requests could both read a count just under the
+  cap and both insert, landing one over) — low-impact for a solo-coach product where concurrent
+  requests from the same account are rare, and worth a DB-level check constraint or advisory lock
+  in a future hardening pass but not an MVP blocker. Separately, if the coach-row `select` in
+  `addClient` ever returned `null` for an authenticated user (not reachable in practice today,
+  since every `auth.users` row gets a coach row via the same-transaction trigger verified in Item
+  1), the code's `if (coach) { ...limit check... }` guard would skip the limit check entirely
+  rather than fail closed — flagging for awareness since it's a fail-open pattern, but not
+  triggerable under the current provisioning guarantee, so not filing as a blocker.
+
+No bugs found in this item. The cap is a genuine server-side block, not a UI-only warning.
+
+### Item 3 — Upgrade prompt appears correctly: PASS (with a UX gap noted)
+
+- When `addClient` hits the cap, it returns
+  `error: "You've reached your plan's client limit. Upgrade your plan to add more clients."`,
+  which `AddClientForm` (`src/components/clients/add-client-form.tsx`) renders inline under the
+  form via `useActionState`. The prompt does appear, on the correct trigger (the blocked attempt
+  itself), with correct copy telling the coach what to do.
+- `/dashboard/billing` (`src/app/dashboard/billing/page.tsx`) independently and correctly surfaces
+  the same plan-state facts a coach would need to act on the prompt: current effective plan,
+  `"X / Y active clients"` (rendering `"unlimited"` for Studio rather than a literal
+  `Infinity`/`"∞"` string — checked this explicitly since `Infinity` rendered directly would be a
+  visible bug; it is guarded with a ternary and is not), trial days remaining when trialing, and an
+  explicit red-text "Your trial has ended. Pick a plan below to keep adding clients." message when
+  `effectivePlan === "blocked"`. All three PLAN_TIERS render as selectable cards driven from the
+  same `billing.ts` source of truth `addClient` gates against (no hardcoded/duplicated numbers to
+  drift out of sync).
+- **UX gap, not a functional bug (already on record from TSK-009's own PM review at merge time,
+  re-confirmed independently here):** the inline error text on the Add Client form is plain text —
+  it says "Upgrade your plan" but is not an actual `<Link href="/dashboard/billing">`, so a coach
+  who hits the cap has to know to navigate to Billing themselves rather than one-clicking there
+  from the blocked-attempt moment. There's also no proactive "approaching your limit" indicator on
+  the Clients page itself (e.g. at 9/10) — the only place client-count-vs-limit is visible before
+  hitting the wall is the Billing page, which a coach has no reason to visit until they're already
+  blocked. Neither gap breaks the requirement as stated in the task ("upgrade prompt appears") —
+  the prompt does appear, with correct and honest copy, at the moment it's needed — but a
+  clickable link and/or a near-limit nudge on the Clients page would materially close the gap
+  between "sees the message" and "completes the upgrade." Worth a follow-up backlog item; not
+  filing as BLOCKED since nothing is broken or misleading.
+
+No bugs found in this item.
+
+### TSK-014 Result summary
+
+| Item | Behavior | Result |
+|---|---|---|
+| 1 | New coach gets `plan='trialing'` + `trial_ends_at = now()+14d` on signup (both paths) | PASS |
+| 1 | Trial expiry correctly derived live from `trial_ends_at`, not a stale stored flag | PASS |
+| 2 | Client-cap check runs server-side (Server Action), before insert, not bypassable from client | PASS |
+| 2 | Tier limits match PROJECT_BRIEF.md §4 (Starter 10 / Pro 30 / Studio unlimited) | PASS |
+| 2 | Studio's `Infinity` limit never blocks; `blocked` plan (0 limit) blocks all client adds | PASS |
+| 2 | Stripe webhook keeps `plan` in sync with subscription state (checkout/update/cancel) | PASS |
+| 3 | Upgrade-limit message appears on the blocking attempt with correct, honest copy | PASS |
+| 3 | Billing page accurately shows plan, trial days left, client count/limit, blocked state | PASS |
+| 3 | Upgrade CTA is plain text (no link) and no proactive near-limit warning exists | NOTED (non-blocking UX gap, not filed as BLOCKED) |
+
+---
+
 ## Recent Commits / PRs
 * This handshake update (direct commit to `main`, coordination file per PM_CHARTER — no PR
   needed, no app code touched).
 
 ## Blockers & QA Failures
 (none — TSK-012 passed code-level review on both items; TSK-013 passed code-level review on all
-three items, including the "never auto-send" hard requirement; see each task's section above for
-the caveat that neither pass is yet runtime-verified against a live Supabase/Anthropic setup)
+three items, including the "never auto-send" hard requirement; TSK-014 passed code-level review on
+all three items, including the specific "is the cap actually server-side enforced, not UI-only"
+concern raised in its task setup — confirmed it is. See each task's section above for the caveat
+that no pass in this file is yet runtime-verified against a live Supabase/Stripe/Anthropic setup,
+and for the small number of pre-existing non-blocking notes each pass surfaced (TOCTOU race and
+plain-text upgrade CTA on TSK-014, naming nit on TSK-013) — none rise to a filed blocker.)
 
 ## Cross-Squad Requests
 (none)
