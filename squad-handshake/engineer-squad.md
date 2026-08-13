@@ -6,6 +6,21 @@
 </squad_metadata>
 
 ## Current Focus
+**2026-08-13, URGENT — PR #11 merged by owner directly, but production deploy is now failing.**
+The owner merged PR #11 (TSK-020) to `main` at 05:06 UTC. The resulting production deployment
+(`dpl_EtbYckutfpvtYYEczAgbzgcd2heC`) failed with the exact same error this PR flagged before merge:
+`NEXT_PUBLIC_STACK_PROJECT_ID` (Neon Auth / Stack Auth) still isn't set on Vercel. Confirmed via
+Vercel build logs — same `src/lib/auth/stack.ts:15` failure as every prior attempt.
+**Practical impact:** Vercel does not take prod down on a failed build — it keeps serving the last
+*successful* deployment, which is the pre-merge (Supabase Auth) code, confirmed via
+`get_runtime_errors` showing nothing in the last hour. So the site is not currently broken for
+users, but `main` and production are now out of sync, and **every subsequent push to `main` will
+also fail to deploy** until the three Stack Auth vars are set. This needs owner action, still:
+`NEXT_PUBLIC_STACK_PROJECT_ID` / `NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY` /
+`STACK_SECRET_SERVER_KEY` on Vercel (Preview *and* Production scope). PM pushed this to the owner
+directly. TSK-021 (next in the Neon epic) stays blocked until this resolves and a fresh deployment
+goes green — do not start it against `main` in its current, unbuildable state.
+
 **2026-08-06 check-in: confirmed PR #11 still blocked, no change.** Re-checked PR #11's Vercel
 status directly — still `failure`, same root cause (missing Stack Auth env vars on Vercel), as of
 04:54 UTC. TSK-021 explicitly depends on TSK-020 landing (needs the new auth's actual user-ID

@@ -650,7 +650,7 @@ Schema: see `PM_CHARTER.md` / `ai-engineering-loop` skill.
 <task_item>
   <id>TSK-020</id>
   <source>OWNER_POPUP</source>
-  <status>READY_FOR_PM</status>
+  <status>DONE</status>
   <priority>HIGH</priority>
   <title>Replace Supabase Auth with Neon-compatible auth (coach signup/login/OAuth + sessions)</title>
   <description>
@@ -664,6 +664,15 @@ Schema: see `PM_CHARTER.md` / `ai-engineering-loop` skill.
     (rename/rewrite as the new auth+DB setup doc) and `.env.example` to match. This unblocks
     TSK-021.
   </description>
+  <pm_notes>
+    2026-08-13: PR #11 merged by the owner directly. Code review (done pre-merge) found it
+    correct and complete against this task's spec. Marking DONE on that basis — BUT flagging a
+    live issue: the resulting production deployment failed with the exact missing-env-vars error
+    this PR predicted (NEXT_PUBLIC_STACK_PROJECT_ID and friends still not set on Vercel).
+    Production is not down (Vercel kept serving the last successful pre-merge deployment), but
+    `main` cannot deploy again until those vars are set — see squad-handshake/engineer-squad.md
+    and TSK-021's blocked status below for detail. Pushed to owner directly.
+  </pm_notes>
   <researcher_notes></researcher_notes>
 </task_item>
 
