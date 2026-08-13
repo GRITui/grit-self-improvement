@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { stackServerApp } from "@/lib/auth/stack";
+import { createDataClient } from "@/lib/supabase/data";
 import { computeStreak } from "@/lib/streak";
 import { RiskBadge } from "@/components/dashboard/risk-badge";
 import { CheckinCard } from "@/components/dashboard/checkin-card";
@@ -12,19 +13,21 @@ export default async function ClientDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await stackServerApp.getUser();
 
   if (!user) {
     redirect("/login");
   }
 
+  const supabase = createDataClient();
+  // coach_id filter is the ownership check -- a client belonging to
+  // another coach now resolves the same way a nonexistent one does
+  // (notFound()) instead of relying on RLS to hide it.
   const { data: client } = await supabase
     .from("clients")
     .select("*")
     .eq("id", id)
+    .eq("coach_id", user.id)
     .single<Client>();
 
   if (!client) {

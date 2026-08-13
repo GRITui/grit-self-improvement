@@ -1,19 +1,68 @@
-# Supabase setup
+# Auth + database setup
 
-1. Create a project at https://supabase.com.
-2. Copy `.env.example` to `.env.local` and fill in the project's URL and anon
-   key (Project Settings → API).
-3. Run the SQL in `migrations/` against the project (SQL Editor, or
-   `supabase db push` if using the Supabase CLI locally).
-4. Enable the Google provider under Authentication → Providers, and add
-   `<your-site-url>/auth/callback` as an authorized redirect URL (both in
-   Supabase and in the Google Cloud OAuth client).
-5. Under Authentication → URL Configuration, set the Site URL to match
-   `NEXT_PUBLIC_SITE_URL`.
-6. Copy the service role key (Project Settings → API) into
-   `SUPABASE_SERVICE_ROLE_KEY` — used only by the Stripe webhook handler.
+**Status: transitional (TSK-020 of the TSK-019 Neon migration epic).** Auth
+now runs on Neon Auth. The `coaches`/`clients`/`checkins` tables still live
+in Supabase Postgres for now -- TSK-021 moves them to Neon Postgres proper.
+Once that lands this file should be replaced outright (tracked as
+TSK-024); until then, both setups below are required for the app to work.
 
-## Stripe setup
+## 1. Neon Auth setup
+
+Neon Auth is Neon's first-party auth product (built on
+[Stack Auth](https://stack-auth.com)).
+
+1. Open your Neon project's **Auth** tab in the Neon console and enable
+   Neon Auth (this provisions a Stack Auth project for you). If you'd
+   rather not go through Neon for this, a standalone project at
+   https://app.stack-auth.com works identically for everything below.
+2. Copy the three keys it gives you (Project ID, Publishable Client Key,
+   Secret Server Key) into `.env.local`:
+   ```
+   NEXT_PUBLIC_STACK_PROJECT_ID=
+   NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY=
+   STACK_SECRET_SERVER_KEY=
+   ```
+3. Under the project's **Auth methods**, enable **Email/password** and
+   **Google** OAuth. For Google, you'll need a Google Cloud OAuth client
+   (Credentials -> OAuth client ID -> Web application); Stack Auth's
+   dashboard shows the exact redirect URI to add to that client's
+   "Authorized redirect URIs" (it's on Stack's own domain, not this app's
+   -- Stack proxies the OAuth handshake, so no `/auth/callback` route needs
+   registering on this app's side, unlike the old Supabase setup).
+4. Under **Domains**, add your site's origin(s) (e.g.
+   `http://localhost:3000` for local dev, plus your production domain) so
+   Stack Auth allows redirecting back to this app after sign-in/sign-up.
+   This app's own handler route (`/handler/[...stack]`, wired up in
+   `src/app/layout.tsx` + `src/lib/auth/stack.ts`) is what Stack redirects
+   through.
+
+No `handle_new_coach` trigger or `auth.users` table is involved anymore --
+see `migrations/00000000000008_coaches_neon_auth.sql`. A coach's row in
+`public.coaches` is created by the app itself (`ensureCoachRow()` in
+`src/lib/auth/session.ts`) the first time an authenticated session is seen,
+since Neon Auth doesn't write into this Supabase database to trigger off
+of.
+
+## 2. Database (Supabase Postgres, pending TSK-021)
+
+1. Create a project at https://supabase.com, if one doesn't already exist.
+2. Copy the project's URL and both keys into `.env.local`:
+   ```
+   NEXT_PUBLIC_SUPABASE_URL=
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=
+   SUPABASE_SERVICE_ROLE_KEY=
+   ```
+   The anon key is only used by the public, tokenized check-in flow
+   (`src/app/checkin/[token]/*`), which authorizes off the invite token
+   itself and never needed a Supabase session. Every coach-scoped dashboard
+   query now goes through the service-role key instead, with an explicit
+   `coach_id` filter at each call site (see `src/lib/supabase/data.ts`) --
+   Supabase's Row Level Security can no longer authenticate these requests
+   now that sessions come from Neon Auth, not Supabase Auth.
+3. Run the SQL in `migrations/` against the project, in order (SQL Editor,
+   or `supabase db push` if using the Supabase CLI locally).
+
+## 3. Stripe setup
 
 1. Create three recurring Prices in the Stripe Dashboard (Starter $29/mo,
    Pro $59/mo, Studio $99/mo) and set their IDs as `STRIPE_PRICE_STARTER`
